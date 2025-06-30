@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام الإدارة | تسجيل الدخول</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="نظام إدارة مؤسسة عبدالمنعم الراشد الإنسانية - تسجيل دخول المسؤول">
+    <meta name="keywords" content="تسجيل دخول, إدارة, مؤسسة عبدالمنعم الراشد">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --secondary: #3f37c9;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --danger: #f72585;
+            --success: #4cc9f0;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --gradient: linear-gradient(135deg, var(--primary), var(--success));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: url('https://www.transparenttextures.com/patterns/white-diamond.png'), linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body.dark-mode {
+            background: url('https://www.transparenttextures.com/patterns/dark-mosaic.png'), linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+        }
+        
+        .dark-mode .login-container {
+            background: rgba(44, 44, 44, 0.9);
+            color: #f5f7fa;
+            backdrop-filter: blur(10px);
+        }
+        
+        .dark-mode .login-container::before {
+            background: linear-gradient(to right, var(--primary-light), var(--success));
+        }
+        
+        .dark-mode input {
+            background-color: #333;
+            color: #f5f7fa;
+            border-color: #444;
+        }
+        
+        .dark-mode label {
+            color: #f5f7fa;
+        }
+        
+        .dark-mode h2 {
+            color: #f5f7fa;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--gradient);
+            animation: grow 1s ease-out;
+        }
+        
+        @keyframes grow {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+            animation: bounce 1s ease-out;
+        }
+        
+        @keyframes bounce {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .logo svg {
+            transition: var(--transition);
+        }
+        
+        .logo svg:hover {
+            transform: rotate(360deg);
+            stroke: var(--success);
+        }
+        
+        h2 {
+            color: var(--dark);
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 700;
+            position: relative;
+            animation: textFade 1s ease-out;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 3px;
+            background: var(--gradient);
+            border-radius: 3px;
+            animation: grow 1.2s ease-out;
+        }
+        
+        @keyframes textFade {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: right;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon .icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        
+        .input-with-icon input {
+            width: 100%;
+            padding: 15px 20px 15px 45px;
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-family: 'Tajawal', sans-serif;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .input-with-icon .toggle-password {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        
+        .input-with-icon .toggle-password:hover {
+            color: var(--primary);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+            transform: scale(1.01);
+        }
+        
+        .input-with-icon:hover .icon {
+            color: var(--primary);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.4s ease;
+        }
+        
+        .btn:hover::before {
+            left: 0;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .theme-toggle:hover {
+            background: var(--gradient);
+            color: white;
+            transform: rotate(360deg);
+        }
+        
+        .dark-mode .theme-toggle {
+            background: rgba(44, 44, 44, 0.5);
+            color: #f5f7fa;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark-mode .theme-toggle:hover {
+            background: linear-gradient(135deg, var(--success), var(--primary));
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            animation: fadeIn 0.7s ease-out;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            width: auto;
+            margin-left: 10px;
+            accent-color: var(--primary);
+        }
+        
+        .forgot-password a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .forgot-password a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            text-align: right;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .spinner {
+            display: none;
+            text-align: center;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        .dark-mode .loader {
+            border: 4px solid #444;
+            border-top: 4px solid var(--success);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            h2 {
+                font-size: 1.6rem;
+            }
+            .theme-toggle {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <button class="theme-toggle" id="theme-toggle" title="تبديل الوضع">
+            <i class="fas fa-moon"></i>
+        </button>
+        
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#4361ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+        </div>
+        
+        <h2>تسجيل الدخول</h2>
+        
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label for="username">اسم المستخدم</label>
+                <div class="input-with-icon">
+                    <input type="text" id="username" name="username" placeholder="أدخل اسم المستخدم" aria-label="اسم المستخدم" required>
+                    <span class="icon"><i class="fas fa-user"></i></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <div class="input-with-icon">
+                    <input type="password" id="password" name="password" placeholder="أدخل كلمة المرور" aria-label="كلمة المرور" required>
+                    <span class="toggle-password"><i class="fas fa-eye"></i></span>
+                </div>
+            </div>
+            
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">تذكرني</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">تسجيل الدخول</button>
+        </form>
+        
+        <div class="spinner">
+            <div class="loader"></div>
+        </div>
+    </div>
+    
+    <script>
+        // إظهار/إخفاء كلمة المرور
+        const togglePassword = document.querySelector('.toggle-password');
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                const password = document.querySelector('#password');
+                const icon = this.querySelector('i');
+                if (password.type === 'password') {
+                    password.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    password.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+        
+        // تبديل الـ Dark Mode
+        const themeToggle = document.querySelector('#theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const icon = this.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+        }
+        
+        // التحقق من الإدخال
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const username = document.querySelector('#username').value;
+                const password = document.querySelector('#password').value;
+                if (!username || !password) {
+                    e.preventDefault();
+                    alert('يرجى ملء جميع الحقول.');
+                    return;
+                }
+                if (password.length < 6) {
+                    e.preventDefault();
+                    alert('كلمة المرور يجب أن تكون 6 أحرف على الأقل.');
+                    return;
+                }
+                document.querySelector('.spinner').style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>

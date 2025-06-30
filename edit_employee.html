@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل البيانات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --border-radius: 12px;
+            --box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+            --dark-bg: #1a1a2e;
+            --dark-element: #2c2c2c;
+            --dark-text: #f5f7fa;
+            --success: #4cc9f0;
+            --gradient: linear-gradient(135deg, var(--primary), var(--success));
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: url('https://www.transparenttextures.com/patterns/white-diamond.png'), linear-gradient(135deg, #f5f7ff, #e2e7ff);
+            margin: 0;
+            padding: 30px;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+        body.dark-mode {
+            background: url('https://www.transparenttextures.com/patterns/dark-mosaic.png'), var(--dark-bg);
+            color: var(--dark-text);
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            animation: fadeIn 0.8s ease-out;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark-mode .container {
+            background: rgba(44, 44, 44, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2 {
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+            animation: textFade 1s ease-out;
+        }
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 3px;
+            animation: grow 1s ease-out;
+        }
+        @keyframes grow {
+            from { width: 0; }
+            to { width: 100px; }
+        }
+        @keyframes textFade {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .dark-mode h2 {
+            color: var(--success);
+        }
+        .form-group {
+            margin-bottom: 20px;
+            animation: slideUp 0.6s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        .dark-mode label {
+            color: var(--dark-text);
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 18px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Tajawal', sans-serif;
+            background-color: white;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .dark-mode input[type="text"],
+        .dark-mode input[type="number"],
+        .dark-mode input[type="email"],
+        .dark-mode input[type="date"],
+        .dark-mode select,
+        .dark-mode textarea {
+            background-color: #333;
+            color: var(--dark-text);
+            border-color: #444;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+            transform: scale(1.01);
+        }
+        .dark-mode input[type="text"]:focus,
+        .dark-mode input[type="number"]:focus,
+        .dark-mode input[type="email"]:focus,
+        .dark-mode input[type="date"]:focus,
+        .dark-mode select:focus,
+        .dark-mode textarea:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 4px rgba(76, 201, 240, 0.2);
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            animation: fadeIn 1s ease-out;
+        }
+        button {
+            padding: 14px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.4s ease;
+        }
+        button:hover::before {
+            left: 0;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            animation: pulse 0.5s infinite;
+        }
+        .dark-mode button:hover {
+            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        button.primary {
+            background: var(--gradient);
+            color: white;
+        }
+        button.primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #3aaed8);
+        }
+        .dark-mode button.primary {
+            background: linear-gradient(135deg, var(--success), var(--primary));
+        }
+        button.secondary {
+            background-color: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        button.secondary:hover {
+            background-color: #f0f4ff;
+        }
+        .dark-mode button.secondary {
+            background-color: var(--dark-element);
+            color: var(--dark-text);
+            border-color: var(--success);
+        }
+        .dark-mode button.secondary:hover {
+            background-color: #3c3c3c;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 22px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            background: var(--gradient);
+            color: white;
+            transform: rotate(360deg) scale(1.1);
+        }
+        .dark-mode .theme-toggle {
+            background: rgba(44, 44, 44, 0.5);
+            color: var(--dark-text);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+        .dark-mode .theme-toggle:hover {
+            background: linear-gradient(135deg, var(--success), var(--primary));
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+            .theme-toggle {
+                top: 15px;
+                left: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" id="theme-toggle" title="تبديل الوضع">
+            <i class="fas fa-moon"></i>
+        </button>
+        <h2>تعديل بيانات {{ department }}</h2>
+
+        <form id="editForm" method="POST" action="/update_employee/{{ department }}/{{ employee.id }}">
+            {% if department == "الموظفين" %}
+                <div class="form-group">
+                    <label for="name">الاسم الكامل:</label>
+                    <input type="text" id="name" name="name" value="{{ employee.name }}" placeholder="أدخل الاسم الكامل" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">الجوال:</label>
+                    <input type="text" id="phone" name="phone" value="{{ employee.phone }}" placeholder="أدخل رقم الجوال">
+                </div>
+                <div class="form-group">
+                    <label for="identity">الهوية/الإقامة:</label>
+                    <input type="text" id="identity" name="identity" value="{{ employee.identity }}" placeholder="أدخل الهوية/الإقامة (10 أرقام)" pattern="\d{10}" required>
+                </div>
+                <div class="form-group">
+                    <label for="employee_id">الرقم الوظيفي:</label>
+                    <input type="text" id="employee_id" name="employee_id" value="{{ employee.employee_id }}" placeholder="أدخل الرقم الوظيفي" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني:</label>
+                    <input type="email" id="email" name="email" value="{{ employee.email }}" placeholder="أدخل البريد الإلكتروني">
+                </div>
+                <div class="form-group">
+                    <label for="work_type">طبيعة الدوام:</label>
+                    <select id="work_type" name="work_type" required>
+                        <option value="">-- اختر --</option>
+                        <option value="دوام كامل" {% if employee.work_type == "دوام كامل" %}selected{% endif %}>دوام كامل</option>
+                        <option value="دوام جزئي" {% if employee.work_type == "دوام جزئي" %}selected{% endif %}>دوام جزئي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="hire_date">تاريخ التوظيف:</label>
+                    <input type="date" id="hire_date" name="hire_date" value="{{ employee.hire_date }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="job_title">المسمى الوظيفي:</label>
+                    <input type="text" id="job_title" name="job_title" value="{{ employee.job_title }}" placeholder="أدخل المسمى الوظيفي" required>
+                </div>
+                <div class="form-group">
+                    <label for="notes">الملاحظات:</label>
+                    <textarea id="notes" name="notes" placeholder="أدخل الملاحظات">{{ employee.notes }}</textarea>
+                </div>
+
+            {% elif department == "المستفيدين" %}
+                <div class="form-group">
+                    <label for="name">الاسم الكامل:</label>
+                    <input type="text" id="name" name="name" value="{{ employee.name }}" placeholder="أدخل الاسم الكامل" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">رقم الجوال:</label>
+                    <input type="text" id="phone" name="phone" value="{{ employee.phone }}" placeholder="أدخل رقم الجوال">
+                </div>
+                <div class="form-group">
+                    <label for="initiative">اسم المبادرة:</label>
+                    <input type="text" id="initiative" name="initiative" value="{{ employee.initiative }}" placeholder="أدخل اسم المبادرة" required>
+                </div>
+
+            {% elif department == "مجلس الأمناء" %}
+                <div class="form-group">
+                    <label for="name">الاسم الكامل:</label>
+                    <input type="text" id="name" name="name" value="{{ employee.name }}" placeholder="أدخل الاسم الكامل" required>
+                </div>
+                <div class="form-group">
+                    <label for="national_id">السجل المدني:</label>
+                    <input type="text" id="national_id" name="national_id" value="{{ employee.national_id }}" placeholder="أدخل السجل المدني (10 أرقام)" pattern="\d{10}" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">رقم الجوال:</label>
+                    <input type="text" id="phone" name="phone" value="{{ employee.phone }}" placeholder="أدخل رقم الجوال">
+                </div>
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني:</label>
+                    <input type="email" id="email" name="email" value="{{ employee.email }}" placeholder="أدخل البريد الإلكتروني">
+                </div>
+
+            {% elif department == "المتطوعين" %}
+                <div class="form-group">
+                    <label for="name">الاسم الكامل:</label>
+                    <input type="text" id="name" name="name" value="{{ employee.name }}" placeholder="أدخل الاسم الكامل" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">رقم الجوال:</label>
+                    <input type="text" id="phone" name="phone" value="{{ employee.phone }}" placeholder="أدخل رقم الجوال">
+                </div>
+                <div class="form-group">
+                    <label for="national_id">السجل المدني:</label>
+                    <input type="text" id="national_id" name="national_id" value="{{ employee.national_id }}" placeholder="أدخل السجل المدني (10 أرقام)" pattern="\d{10}" required>
+                </div>
+                <div class="form-group">
+                    <label for="age">العمر:</label>
+                    <input type="number" id="age" name="age" value="{{ employee.age }}" placeholder="أدخل العمر (18-100)" min="18" max="100">
+                </div>
+
+            {% else %}
+                <div class="form-group">
+                    <label for="name">الاسم الكامل:</label>
+                    <input type="text" id="name" name="name" value="{{ employee.name }}" placeholder="أدخل الاسم الكامل" required>
+                </div>
+                <div class="form-group">
+                    <label for="age">العمر:</label>
+                    <input type="number" id="age" name="age" value="{{ employee.age }}" placeholder="أدخل العمر (18-100)" min="18" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="phone">رقم الجوال:</label>
+                    <input type="text" id="phone" name="phone" value="{{ employee.phone }}" placeholder="أدخل رقم الجوال">
+                </div>
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني:</label>
+                    <input type="email" id="email" name="email" value="{{ employee.email }}" placeholder="أدخل البريد الإلكتروني">
+                </div>
+                <input type="hidden" name="department" value="{{ employee.department }}">
+            {% endif %}
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+            <div class="button-group">
+                <button type="submit" class="primary" title="تحديث البيانات"><i class="fas fa-save"></i> تحديث البيانات</button>
+                <button type="button" class="secondary" onclick="resetForm()" title="إرجاع البيانات السابقة"><i class="fas fa-times"></i> إرجاع البيانات السابقة</button>
+                <button type="button" class="secondary" onclick="window.location.href='/home'" title="العودة إلى الصفحة الرئيسية"><i class="fas fa-arrow-right"></i> العودة إلى الصفحة الرئيسية</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // تبديل الـ Dark Mode
+        const themeToggle = document.querySelector('#theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const icon = this.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                } else {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            });
+        }
+
+        // تخزين القيم الأصلية للنموذج
+        const initialFormData = {
+            name: document.getElementById('name')?.value,
+            phone: document.getElementById('phone')?.value,
+            initiative: document.getElementById('initiative')?.value,
+            national_id: document.getElementById('national_id')?.value,
+            email: document.getElementById('email')?.value,
+            age: document.getElementById('age')?.value,
+            department: document.querySelector('input[name="department"]')?.value,
+            identity: document.getElementById('identity')?.value,
+            employee_id: document.getElementById('employee_id')?.value,
+            work_type: document.getElementById('work_type')?.value,
+            hire_date: document.getElementById('hire_date')?.value,
+            job_title: document.getElementById('job_title')?.value,
+            notes: document.getElementById('notes')?.value
+        };
+
+        function resetForm() {
+            const form = document.getElementById('editForm');
+            form.reset();
+            if (initialFormData.name) document.getElementById('name').value = initialFormData.name;
+            if (initialFormData.phone) document.getElementById('phone').value = initialFormData.phone;
+            if (initialFormData.initiative) document.getElementById('initiative').value = initialFormData.initiative;
+            if (initialFormData.national_id) document.getElementById('national_id').value = initialFormData.national_id;
+            if (initialFormData.email) document.getElementById('email').value = initialFormData.email;
+            if (initialFormData.age) document.getElementById('age').value = initialFormData.age;
+            if (initialFormData.identity) document.getElementById('identity').value = initialFormData.identity;
+            if (initialFormData.employee_id) document.getElementById('employee_id').value = initialFormData.employee_id;
+            if (initialFormData.work_type) document.getElementById('work_type').value = initialFormData.work_type;
+            if (initialFormData.hire_date) document.getElementById('hire_date').value = initialFormData.hire_date;
+            if (initialFormData.job_title) document.getElementById('job_title').value = initialFormData.job_title;
+            if (initialFormData.notes) document.getElementById('notes').value = initialFormData.notes;
+        }
+    </script>
+</body>
+</html>
