@@ -1,18 +1,17 @@
 const https = require('https');
 
-const INSTANCES = [
+const HOSTS = [
+  'cobalt.lunar.icu',
+  'co.wuk.sh',
+  'cobalt.svaha.eu.org',
   'cobalt.api.timelessnesses.me',
-  'cobalt.drgns.space',
   'capi.7tv.app',
-  'cobalt.ggtyler.dev',
-  'cobalt.rocks',
-  'cobalt-api.kwiatekmiki.com',
 ];
 
-function postJSON(host, body) {
+function postCobalt(host, body) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(body);
-    const options = {
+    const req = https.request({
       hostname: host,
       path: '/',
       method: 'POST',
@@ -20,19 +19,19 @@ function postJSON(host, body) {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Content-Length': Buffer.byteLength(data),
+        'User-Agent': 'vid-downloader/1.0',
       },
-      timeout: 12000,
-    };
-    const req = https.request(options, (res) => {
+      timeout: 15000,
+    }, (res) => {
       let raw = '';
-      res.on('data', (chunk) => raw += chunk);
+      res.on('data', c => raw += c);
       res.on('end', () => {
         try { resolve(JSON.parse(raw)); }
-        catch (e) { reject(new Error('Invalid JSON')); }
+        catch { reject(new Error('bad json')); }
       });
     });
     req.on('error', reject);
-    req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
+    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
     req.write(data);
     req.end();
   });
@@ -42,41 +41,46 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { url, videoQuality } = req.body || {};
-  if (!url) return res.status(400).json({ error: 'URL is required' });
+  if (!url) return res.status(400).json({ error: 'URL مطلوب' });
 
   const body = { url };
   if (videoQuality) body.videoQuality = videoQuality;
 
-  const ERROR_MAP = {
-    'error.api.link.invalid': 'الرابط غير صحيح',
-    'error.api.fetch.fail': 'تعذّر جلب الفيديو من المنصة',
-    'error.api.link.unsupported': 'هذه المنصة غير مدعومة',
-    'error.api.content.too_long': 'الفيديو طويل جداً',
-  };
-
-  for (const host of INSTANCES) {
+  const errors = [];
+  for (const host of HOSTS) {
     try {
-      const data = await postJSON(host, body);
-      if (data.status === 'error') {
-        const code = data.error?.code;
-        const msg = ERROR_MAP[code] || code || 'خطأ غير معروف';
+      const d = await postCobalt(host, body);
+      if (d.status === 'error') {
+        const code = d.error?.code || '';
+        const map = {
+          'error.api.link.invalid': 'الرابط غير صحيح',
+          'error.api.link.unsupported': 'المنصة غير مدعومة',
+          'error.api.fetch.fail': 'تعذّر جلب الفيديو',
+          'error.api.content.too_long': 'الفيديو طويل جداً',
+        };
         if (code === 'error.api.link.invalid' || code === 'error.api.link.unsupported') {
-          return res.status(400).json({ error: msg });
+          return res.status(400).json({ error: map[code] || code });
         }
+        errors.push(map[code] || code);
         continue;
       }
-      if (data.url || data.status === 'picker') {
-        return res.status(200).json(data);
+      if (d.url || d.status === 'picker') {
+        return res.status(200).json(d);
       }
     } catch (e) {
+      errors.push(host + ': ' + e.message);
       continue;
     }
   }
 
-  return res.status(502).json({ error: 'فشل الاتصال بجميع الخوادم' });
+  // Log errors for debugging
+  console.error('All hosts failed:', errors);
+  return res.status(502).json({ 
+    error: 'فشل الاتصال بجميع الخوادم',
+    debug: errors
+  });
 };
