@@ -27,8 +27,7 @@ module.exports = async function handler(req, res) {
       });
 
       const d = await r.json();
-      console.log('tikwm response:', JSON.stringify(d).slice(0, 400));
-
+console.log('tikwm full:', JSON.stringify(d.data));
       if (d.code === 0 && d.data) {
         const data = d.data;
 const videoUrl = data.hdplay || data.play;
