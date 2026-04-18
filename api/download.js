@@ -15,57 +15,57 @@ module.exports = async function handler(req, res) {
 
   const KEY = process.env.RAPIDAPI_KEY;
 
-  // ---- social-media-video-downloader ----
-  try {
-    const r = await fetch(
-      `https://social-media-video-downloader.p.rapidapi.com/smvd/get/all?url=${encodeURIComponent(url)}`,
-      {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com',
-          'x-rapidapi-key': KEY,
-        },
-        signal: AbortSignal.timeout(25000),
-      }
+  // استخراج videoId من روابط يوتيوب
+  function extractYoutubeId(url) {
+    const match = url.match(
+      /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
     );
-
-    const d = await r.json();
-    console.log('SMVD response:', JSON.stringify(d).slice(0, 400));
-
-    if (r.ok && d.links && d.links.length > 0) {
-      // اختار أفضل رابط mp4
-      const best =
-        d.links.find((l) => l.quality === 'hd' || l.quality === '720p') ||
-        d.links.find((l) => l.link?.includes('.mp4')) ||
-        d.links[0];
-
-      if (best?.link) {
-        return res.status(200).json({
-          status: 'redirect',
-          url: best.link,
-          title: d.title || '',
-          thumbnail: d.picture || '',
-        });
-      }
-    }
-
-    // لو ما في links جرب حقول أخرى
-    const directUrl = d.url || d.video || d.hd_video || d.sd_video;
-    if (directUrl) {
-      return res.status(200).json({
-        status: 'redirect',
-        url: directUrl,
-        title: d.title || '',
-        thumbnail: d.thumbnail || d.cover || '',
-      });
-    }
-
-    console.warn('No video URL found in response:', JSON.stringify(d).slice(0, 300));
-  } catch (e) {
-    console.warn('SMVD API failed:', e.message);
+    return match ? match[1] : null;
   }
 
-  // ---- Backup: instagram-tiktok-youtube-downloader ----
+  // ---- social-media-video-downloader - YouTube endpoint ----
+  const ytId = extractYoutubeId(url);
+  if (ytId) {
+    try {
+      const r = await fetch(
+        `https://social-media-video-downloader.p.rapidapi.com/youtube/v3/video/details?videoId=${ytId}&urlAccess=normal&renderableFormats=720p,360p&getTranscript=false`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com',
+            'x-rapidapi-key': KEY,
+          },
+          signal: AbortSignal.timeout(25000),
+        }
+      );
+
+      const d = await r.json();
+      console.log('YouTube API response:', JSON.stringify(d).slice(0, 400));
+
+      // ابحث عن رابط الفيديو في الـ response
+      const formats = d.formats || d.streamingData?.formats || d.streamingData?.adaptiveFormats || [];
+      const videoUrl =
+        formats.find((f) => f.qualityLabel === '720p')?.url ||
+        formats.find((f) => f.qualityLabel === '360p')?.url ||
+        formats[0]?.url ||
+        d.url ||
+        d.videoUrl;
+
+      if (videoUrl) {
+        return res.status(200).json({
+          status: 'redirect',
+          url: videoUrl,
+          title: d.title || d.videoDetails?.title || '',
+          thumbnail: d.thumbnail || d.videoDetails?.thumbnail?.thumbnails?.[0]?.url || '',
+        });
+      }
+    } catch (e) {
+      console.warn('YouTube API failed:', e.message);
+    }
+  }
+
+  // ---- Backup: TikTok & Instagram & others via coder2077 API ----
   try {
     const r2 = await fetch(
       `https://instagram-tiktok-youtube-downloader.p.rapidapi.com/index?url=${encodeURIComponent(url)}`,
@@ -79,24 +79,24 @@ module.exports = async function handler(req, res) {
       }
     );
 
-    if (r2.ok) {
-      const d2 = await r2.json();
-      console.log('Backup API response:', JSON.stringify(d2).slice(0, 300));
+    const d2 = await r2.json();
+    console.log('Backup API response:', JSON.stringify(d2).slice(0, 400));
 
-      const videoUrl =
-        d2.url ||
-        d2.video ||
-        d2.medias?.[0]?.url ||
-        d2.links?.[0]?.url;
+    const videoUrl =
+      d2.url ||
+      d2.video ||
+      d2.medias?.[0]?.url ||
+      d2.links?.[0]?.url ||
+      d2.data?.play ||
+      d2.data?.hdplay;
 
-      if (videoUrl) {
-        return res.status(200).json({
-          status: 'redirect',
-          url: videoUrl,
-          title: d2.title || '',
-          thumbnail: d2.thumbnail || d2.cover || '',
-        });
-      }
+    if (videoUrl) {
+      return res.status(200).json({
+        status: 'redirect',
+        url: videoUrl,
+        title: d2.title || '',
+        thumbnail: d2.thumbnail || d2.cover || '',
+      });
     }
   } catch (e) {
     console.warn('Backup API failed:', e.message);
