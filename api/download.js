@@ -6,58 +6,69 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { url, videoQuality } = req.body || {};
+  const { url } = req.body || {};
   if (!url) return res.status(400).json({ error: 'URL مطلوب' });
 
   if (!process.env.RAPIDAPI_KEY) {
     return res.status(500).json({ error: 'RAPIDAPI_KEY غير مضبوط في البيئة' });
   }
 
-  // ---- الـ API الأولى: all-in-one downloader ----
+  const KEY = process.env.RAPIDAPI_KEY;
+
+  // ---- API: Auto Download All-in-One ----
   try {
-    const r1 = await fetch(
-      `https://instagram-tiktok-youtube-downloader.p.rapidapi.com/index?url=${encodeURIComponent(url)}`,
+    const r = await fetch(
+      'https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink',
       {
-        method: 'GET',
+        method: 'POST',
         headers: {
-          'x-rapidapi-host': 'instagram-tiktok-youtube-downloader.p.rapidapi.com',
-          'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+          'Content-Type': 'application/json',
+          'x-rapidapi-host': 'auto-download-all-in-one.p.rapidapi.com',
+          'x-rapidapi-key': KEY,
         },
+        body: JSON.stringify({ url }),
         signal: AbortSignal.timeout(20000),
       }
     );
 
-    if (r1.ok) {
-      const d1 = await r1.json();
-      const videoUrl =
-        d1.url ||
-        d1.video ||
-        d1.medias?.[0]?.url ||
-        d1.links?.[0]?.url;
+    if (r.ok) {
+      const d = await r.json();
+      console.log('API response:', JSON.stringify(d).slice(0, 300));
+
+      const medias = d.medias || d.media || [];
+      const best =
+        medias.find((m) => m.quality === 'hd' && m.videoAvailable) ||
+        medias.find((m) => m.videoAvailable) ||
+        medias.find((m) => m.url) ||
+        medias[0];
+
+      const videoUrl = best?.url || d.url || d.video;
 
       if (videoUrl) {
         return res.status(200).json({
           status: 'redirect',
           url: videoUrl,
-          title: d1.title || '',
-          thumbnail: d1.thumbnail || d1.cover || '',
+          title: d.title || d.desc || '',
+          thumbnail: d.thumbnail || d.cover || best?.thumbnail || '',
         });
       }
+    } else {
+      const errText = await r.text();
+      console.warn('API error:', r.status, errText.slice(0, 200));
     }
   } catch (e) {
-    console.warn('API #1 failed:', e.message);
+    console.warn('API failed:', e.message);
   }
 
-  // ---- الـ API الثانية: social media video downloader (backup) ----
+  // ---- API Backup: Instagram-TikTok-YouTube Downloader ----
   try {
     const r2 = await fetch(
-      'https://social-media-video-downloader.p.rapidapi.com/smvd/get/all?' +
-        new URLSearchParams({ url }),
+      `https://instagram-tiktok-youtube-downloader.p.rapidapi.com/index?url=${encodeURIComponent(url)}`,
       {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com',
-          'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+          'x-rapidapi-host': 'instagram-tiktok-youtube-downloader.p.rapidapi.com',
+          'x-rapidapi-key': KEY,
         },
         signal: AbortSignal.timeout(20000),
       }
@@ -65,39 +76,27 @@ module.exports = async function handler(req, res) {
 
     if (r2.ok) {
       const d2 = await r2.json();
-      // يرجع مصفوفة روابط بجودات مختلفة
-      const links = d2.links || [];
+      console.log('Backup API response:', JSON.stringify(d2).slice(0, 300));
 
-      // اختار أعلى جودة mp4 مطلوبة
-      const preferred = videoQuality
-        ? links.find(
-            (l) =>
-              l.quality?.includes(videoQuality) &&
-              (l.link?.includes('.mp4') || l.type === 'video/mp4')
-          )
-        : null;
+      const videoUrl =
+        d2.url ||
+        d2.video ||
+        d2.medias?.[0]?.url ||
+        d2.links?.[0]?.url;
 
-      const best =
-        preferred ||
-        links.find(
-          (l) => l.link?.includes('.mp4') || l.type === 'video/mp4'
-        ) ||
-        links[0];
-
-      if (best?.link) {
+      if (videoUrl) {
         return res.status(200).json({
           status: 'redirect',
-          url: best.link,
+          url: videoUrl,
           title: d2.title || '',
-          thumbnail: d2.picture || '',
+          thumbnail: d2.thumbnail || d2.cover || '',
         });
       }
     }
   } catch (e) {
-    console.warn('API #2 failed:', e.message);
+    console.warn('Backup API failed:', e.message);
   }
 
-  // ---- فشل الكل ----
   return res.status(502).json({
     error: 'تعذّر تنزيل الفيديو. تأكد من صحة الرابط أو حاول مرة أخرى.',
   });
