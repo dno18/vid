@@ -15,52 +15,57 @@ module.exports = async function handler(req, res) {
 
   const KEY = process.env.RAPIDAPI_KEY;
 
-  // ---- API: Auto Download All-in-One ----
+  // ---- social-media-video-downloader ----
   try {
     const r = await fetch(
-      'https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink',
+      `https://social-media-video-downloader.p.rapidapi.com/smvd/get/all?url=${encodeURIComponent(url)}`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'x-rapidapi-host': 'auto-download-all-in-one.p.rapidapi.com',
+          'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com',
           'x-rapidapi-key': KEY,
         },
-        body: JSON.stringify({ url }),
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(25000),
       }
     );
 
-    if (r.ok) {
-      const d = await r.json();
-      console.log('API response:', JSON.stringify(d).slice(0, 300));
+    const d = await r.json();
+    console.log('SMVD response:', JSON.stringify(d).slice(0, 400));
 
-      const medias = d.medias || d.media || [];
+    if (r.ok && d.links && d.links.length > 0) {
+      // اختار أفضل رابط mp4
       const best =
-        medias.find((m) => m.quality === 'hd' && m.videoAvailable) ||
-        medias.find((m) => m.videoAvailable) ||
-        medias.find((m) => m.url) ||
-        medias[0];
+        d.links.find((l) => l.quality === 'hd' || l.quality === '720p') ||
+        d.links.find((l) => l.link?.includes('.mp4')) ||
+        d.links[0];
 
-      const videoUrl = best?.url || d.url || d.video;
-
-      if (videoUrl) {
+      if (best?.link) {
         return res.status(200).json({
           status: 'redirect',
-          url: videoUrl,
-          title: d.title || d.desc || '',
-          thumbnail: d.thumbnail || d.cover || best?.thumbnail || '',
+          url: best.link,
+          title: d.title || '',
+          thumbnail: d.picture || '',
         });
       }
-    } else {
-      const errText = await r.text();
-      console.warn('API error:', r.status, errText.slice(0, 200));
     }
+
+    // لو ما في links جرب حقول أخرى
+    const directUrl = d.url || d.video || d.hd_video || d.sd_video;
+    if (directUrl) {
+      return res.status(200).json({
+        status: 'redirect',
+        url: directUrl,
+        title: d.title || '',
+        thumbnail: d.thumbnail || d.cover || '',
+      });
+    }
+
+    console.warn('No video URL found in response:', JSON.stringify(d).slice(0, 300));
   } catch (e) {
-    console.warn('API failed:', e.message);
+    console.warn('SMVD API failed:', e.message);
   }
 
-  // ---- API Backup: Instagram-TikTok-YouTube Downloader ----
+  // ---- Backup: instagram-tiktok-youtube-downloader ----
   try {
     const r2 = await fetch(
       `https://instagram-tiktok-youtube-downloader.p.rapidapi.com/index?url=${encodeURIComponent(url)}`,
