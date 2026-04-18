@@ -67,11 +67,17 @@ input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{width:16px;height:16px;min-width:16px;border:2px solid rgba(96,165,250,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
 
-/* Result */
+/* Result & New Buttons */
 .result-area{margin-top:10px}
-.dl-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(110,231,183,0.07);border:1px solid rgba(110,231,183,0.22);border-radius:12px;color:var(--success);text-decoration:none;font-size:14px;font-weight:700}
+.dl-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(110,231,183,0.07);border:1px solid rgba(110,231,183,0.22);border-radius:12px;color:var(--success);text-decoration:none;font-size:14px;font-weight:700;transition:background 0.2s;}
 .dl-link:hover{background:rgba(110,231,183,0.13)}
 .tip-box{margin-top:8px;padding:10px 13px;background:rgba(252,211,77,0.06);border:1px solid rgba(252,211,77,0.18);border-radius:10px;font-size:11.5px;color:var(--warn);line-height:1.65}
+
+/* أزرار النتائج الجديدة */
+.btn-group { display: flex; flex-direction: column; gap: 8px; }
+.album-btn { background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.25); color: var(--accent); width: 100%; cursor: pointer; font-family: 'Tajawal', sans-serif; }
+.album-btn:hover { background: rgba(96, 165, 250, 0.18); }
+.album-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Picker */
 .picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
@@ -80,7 +86,7 @@ input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
 .pitem img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;margin-bottom:6px}
 .pitem-lbl{font-size:11px;color:var(--muted)}
 
-.foot{text-align:center;font-size:11.5px;color:var(--muted);line-height:1.7}
+.foot{text-align:center;font-size:11.5px;color:var(--muted);line-height:1.7;margin-top: 20px;}
 </style>
 </head>
 <body>
@@ -188,6 +194,43 @@ function showNotif(type, html) {
   el.innerHTML = html;
 }
 
+// دالة جلب الفيديو ومشاركته للألبوم (مخصصة للآيفون)
+async function saveToAlbum(url) {
+  var btn = document.getElementById('albumBtn');
+  var originalContent = btn.innerHTML;
+  
+  // تغيير شكل الزر لإظهار حالة التحميل
+  btn.innerHTML = '<div class="spin" style="width:16px;height:16px;border-color:rgba(96,165,250,0.3);border-top-color:currentColor"></div> جاري التجهيز للألبوم...';
+  btn.disabled = true;
+
+  try {
+    // جلب الفيديو من البروكسي كملف (Blob)
+    var proxyUrl = '/api/proxy?url=' + encodeURIComponent(url);
+    var response = await fetch(proxyUrl);
+    var blob = await response.blob();
+    
+    // تحويل الـ Blob إلى File لكي يفهمه نظام iOS كفيديو حقيقي
+    var file = new File([blob], 'video.mp4', { type: 'video/mp4' });
+
+    // فتح صفحة المشاركة (Share Sheet)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'حفظ الفيديو'
+      });
+    } else {
+      alert('متصفحك لا يدعم الحفظ المباشر للألبوم. يرجى استخدام زر "تنزيل للملفات".');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('حدث خطأ أثناء التجهيز. قد يكون حجم الفيديو كبيراً جداً، استخدم التنزيل العادي.');
+  }
+
+  // إعادة الزر لشكله الطبيعي
+  btn.innerHTML = originalContent;
+  btn.disabled = false;
+}
+
 async function go() {
   var url = document.getElementById('urlIn').value.trim();
   if (!url) { showNotif('err', '⚠ الرجاء إدخال رابط الفيديو'); return; }
@@ -234,13 +277,24 @@ async function go() {
     } else if (data.url) {
       showNotif('ok', '✓ الرابط جاهز!');
       var isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+      
       var tipText = isMobile
-        ? 'إذا لم يبدأ التنزيل تلقائياً، اضغط على الزر أدناه'
+        ? 'للحفظ في الاستديو (الآيفون): اضغط على "تنزيل للألبوم" ثم اختر "حفظ الفيديو" (Save Video).'
         : 'اضغط الزر · أو كليك يمين ← "Save link as" لاختيار مكان الحفظ';
+
+      var proxyUrl = '/api/proxy?url=' + encodeURIComponent(data.url);
+
       document.getElementById('result').innerHTML =
-'<a href="/api/proxy?url=' + encodeURIComponent(data.url) + '" download class="dl-link">' +
-        '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-        'تنزيل الفيديو</a>' +
+        '<div class="btn-group">' +
+          '<a href="' + proxyUrl + '" download class="dl-link">' +
+            '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+            'تنزيل للملفات (عادي)' +
+          '</a>' +
+          '<button id="albumBtn" class="dl-link album-btn" onclick="saveToAlbum(\'' + data.url + '\')">' +
+            '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>' +
+            'تنزيل للألبوم (iOS)' +
+          '</button>' +
+        '</div>' +
         '<div class="tip-box">' + tipText + '</div>';
     }
 
