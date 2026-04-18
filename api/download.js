@@ -31,7 +31,7 @@ module.exports = async function handler(req, res) {
 
       if (d.code === 0 && d.data) {
         const data = d.data;
-        const videoUrl = data.hdplay || data.play || data.wmplay;
+const videoUrl = data.hdplay || data.play;
         if (videoUrl) {
           return res.status(200).json({
             status: 'redirect',
