@@ -18,8 +18,6 @@ body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min
 body::before{content:'';position:fixed;top:-200px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(96,165,250,0.06) 0%,transparent 65%);pointer-events:none}
 body::after{content:'';position:fixed;bottom:-200px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(167,139,250,0.06) 0%,transparent 65%);pointer-events:none}
 .container{width:100%;max-width:480px;position:relative;z-index:1}
-
-/* Header */
 .header{text-align:center;margin-bottom:28px}
 .logo-wrap{display:inline-flex;width:66px;height:66px;border-radius:22px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 0 40px rgba(96,165,250,0.18)}
 h1{font-family:'Sora',sans-serif;font-size:22px;font-weight:600;margin-bottom:4px}
@@ -30,18 +28,12 @@ h1{font-family:'Sora',sans-serif;font-size:22px;font-weight:600;margin-bottom:4p
 .badge.yt{border-color:rgba(255,60,60,0.4);color:#ff5555;background:rgba(255,0,0,0.05)}
 .badge.ig{border-color:rgba(225,48,108,0.4);color:#e1306c;background:rgba(225,48,108,0.05)}
 .badge.tt{border-color:rgba(200,200,200,0.3);color:#ccc;background:rgba(255,255,255,0.04)}
-
-/* Status bar */
 .status-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;margin-bottom:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;font-size:12px;color:var(--muted)}
 .dot{width:8px;height:8px;border-radius:50%;background:#444;flex-shrink:0;transition:background 0.3s}
 .dot.green{background:#6ee7b7}.dot.amber{background:#fcd34d}.dot.red{background:#fca5a5}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .dot.loading{background:#60a5fa;animation:pulse 1s infinite}
-
-/* Card */
 .card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:22px 18px;margin-bottom:12px}
-
-/* Input */
 .input-wrap{position:relative;margin-bottom:12px}
 .url-icon{position:absolute;right:13px;top:50%;transform:translateY(-50%);opacity:0.35;pointer-events:none;display:flex;align-items:center}
 .paste-btn{position:absolute;left:9px;top:50%;transform:translateY(-50%);padding:6px 12px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.15);border-radius:9px;color:var(--accent);font-size:11px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:background 0.2s}
@@ -49,43 +41,37 @@ h1{font-family:'Sora',sans-serif;font-size:22px;font-weight:600;margin-bottom:4p
 input[type=text]{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:14px 42px 14px 68px;font-size:13px;font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color 0.2s;direction:ltr;text-align:left}
 input[type=text]::placeholder{color:var(--muted);font-family:'Tajawal',sans-serif;direction:rtl;text-align:right}
 input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
-
-/* Quality */
 .q-row{display:flex;gap:6px;margin-bottom:12px}
 .qb{flex:1;padding:8px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:11.5px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all 0.2s}
 .qb.sel{background:rgba(96,165,250,0.1);border-color:var(--accent);color:var(--accent);font-weight:700}
-
-/* Download button */
 .dl-btn{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#7c3aed);border:none;border-radius:13px;color:white;font-size:16px;font-family:'Tajawal',sans-serif;font-weight:700;cursor:pointer;transition:opacity 0.2s,transform 0.15s;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 24px rgba(59,130,246,0.18)}
 .dl-btn:hover{opacity:0.9}.dl-btn:active{transform:scale(0.975)}.dl-btn:disabled{opacity:0.35;cursor:not-allowed;box-shadow:none}
-
-/* Notification */
 .notif{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;display:none;align-items:flex-start;gap:9px;line-height:1.55}
 .notif.load{display:flex;background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);color:var(--accent)}
 .notif.ok{display:flex;background:rgba(110,231,183,0.07);border:1px solid rgba(110,231,183,0.2);color:var(--success)}
 .notif.err{display:flex;background:rgba(252,165,165,0.07);border:1px solid rgba(252,165,165,0.2);color:var(--error)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{width:16px;height:16px;min-width:16px;border:2px solid rgba(96,165,250,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
-
-/* Result */
 .result-area{margin-top:10px}
-.dl-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(110,231,183,0.07);border:1px solid rgba(110,231,183,0.22);border-radius:12px;color:var(--success);text-decoration:none;font-size:14px;font-weight:700}
-.dl-link:hover{background:rgba(110,231,183,0.13)}
-.tip-box{margin-top:8px;padding:10px 13px;background:rgba(252,211,77,0.06);border:1px solid rgba(252,211,77,0.18);border-radius:10px;font-size:11.5px;color:var(--warn);line-height:1.65}
 
-/* Picker */
+/* أزرار التنزيل */
+.btn-row{display:flex;gap:8px;margin-bottom:8px}
+.dl-link{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(110,231,183,0.07);border:1px solid rgba(110,231,183,0.22);border-radius:12px;color:var(--success);text-decoration:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
+.dl-link:hover{background:rgba(110,231,183,0.13)}
+.share-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 16px;background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.22);border-radius:12px;color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;white-space:nowrap}
+.share-btn:hover{background:rgba(96,165,250,0.13)}
+.tip-box{padding:10px 13px;background:rgba(252,211,77,0.06);border:1px solid rgba(252,211,77,0.18);border-radius:10px;font-size:11.5px;color:var(--warn);line-height:1.65}
+
 .picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .pitem{display:block;padding:10px;background:var(--card2);border:1px solid var(--border);border-radius:11px;text-align:center;text-decoration:none;color:var(--text);transition:border-color 0.2s}
 .pitem:hover{border-color:var(--accent)}
 .pitem img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;margin-bottom:6px}
 .pitem-lbl{font-size:11px;color:var(--muted)}
-
 .foot{text-align:center;font-size:11.5px;color:var(--muted);line-height:1.7}
 </style>
 </head>
 <body>
 <div class="container">
-
   <div class="header">
     <div class="logo-wrap">
       <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
@@ -147,11 +133,9 @@ input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
 </div>
 
 <script>
-// ⚠️ غيّر هذا الرابط بعد رفع المشروع على Vercel
-// مثال: https://your-project.vercel.app
 var API_BASE = window.location.origin;
-
 var Q = '1080';
+var currentVideoUrl = '';
 
 function detect(u) {
   if (/youtube\.com|youtu\.be/.test(u)) return 'yt';
@@ -188,6 +172,41 @@ function showNotif(type, html) {
   el.innerHTML = html;
 }
 
+var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+var isAndroid = /Android/i.test(navigator.userAgent);
+
+async function shareVideo() {
+  if (!currentVideoUrl) return;
+  var proxyUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(currentVideoUrl);
+
+  // iOS: استخدم Web Share API لمشاركة الرابط → يفتح قائمة "Save to Photos"
+  if (navigator.share) {
+    try {
+      // حاول تنزيل الفيديو كـ blob ثم شاركه
+      showNotif('load', '<div class="spin"></div> جارٍ تحضير الفيديو...');
+      var response = await fetch(proxyUrl);
+      var blob = await response.blob();
+      var file = new File([blob], 'video.mp4', { type: 'video/mp4' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'فيديو' });
+        showNotif('ok', '✓ تمت المشاركة! اختر "حفظ في الصور" من القائمة');
+      } else {
+        // شارك الرابط فقط
+        await navigator.share({ url: proxyUrl, title: 'تنزيل فيديو' });
+        showNotif('ok', '✓ تم فتح قائمة المشاركة');
+      }
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        showNotif('err', '✕ تعذّرت المشاركة');
+      }
+    }
+  } else {
+    // متصفح لا يدعم Share API - افتح الرابط مباشرة
+    window.open(proxyUrl, '_blank');
+  }
+}
+
 async function go() {
   var url = document.getElementById('urlIn').value.trim();
   if (!url) { showNotif('err', '⚠ الرجاء إدخال رابط الفيديو'); return; }
@@ -197,6 +216,7 @@ async function go() {
   document.getElementById('result').innerHTML = '';
   document.getElementById('picker').style.display = 'none';
   document.getElementById('picker').innerHTML = '';
+  currentVideoUrl = '';
 
   showNotif('load', '<div class="spin"></div> جارٍ جلب الفيديو...');
 
@@ -232,16 +252,36 @@ async function go() {
       pg.style.display = 'grid';
 
     } else if (data.url) {
-      showNotif('ok', '✓ الرابط جاهز!');
-      var isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-      var tipText = isMobile
-        ? 'إذا لم يبدأ التنزيل تلقائياً، اضغط على الزر أدناه'
-        : 'اضغط الزر · أو كليك يمين ← "Save link as" لاختيار مكان الحفظ';
-      document.getElementById('result').innerHTML =
-'<a href="/api/proxy?url=' + encodeURIComponent(data.url) + '" download class="dl-link">' +
+      currentVideoUrl = data.url;
+      showNotif('ok', '✓ الفيديو جاهز!');
+
+      var proxyUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(data.url);
+      var resultHtml = '<div class="btn-row">';
+
+      // زر التنزيل المباشر
+      resultHtml += '<a href="' + proxyUrl + '" download="video.mp4" class="dl-link">' +
         '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-        'تنزيل الفيديو</a>' +
-        '<div class="tip-box">' + tipText + '</div>';
+        'تنزيل</a>';
+
+      // زر المشاركة (للآيفون يفتح "Save to Photos")
+      if (isIOS || isAndroid) {
+        resultHtml += '<button class="share-btn" onclick="shareVideo()">' +
+          '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>' +
+          'حفظ للألبوم</button>';
+      }
+
+      resultHtml += '</div>';
+
+      // تلميح حسب الجهاز
+      if (isIOS) {
+        resultHtml += '<div class="tip-box">📱 اضغط "حفظ للألبوم" ← ستظهر قائمة المشاركة ← اختر "حفظ في الصور"</div>';
+      } else if (isAndroid) {
+        resultHtml += '<div class="tip-box">📱 اضغط "تنزيل" وسيُحفظ الفيديو في مجلد التنزيلات</div>';
+      } else {
+        resultHtml += '<div class="tip-box">💻 اضغط تنزيل · أو كليك يمين ← "Save link as"</div>';
+      }
+
+      document.getElementById('result').innerHTML = resultHtml;
     }
 
   } catch (err) {
