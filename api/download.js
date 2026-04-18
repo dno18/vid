@@ -15,94 +15,49 @@ module.exports = async function handler(req, res) {
 
   const KEY = process.env.RAPIDAPI_KEY;
 
-  // استخراج videoId من روابط يوتيوب
-  function extractYoutubeId(url) {
-    const match = url.match(
-      /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-    );
-    return match ? match[1] : null;
-  }
-
-  // ---- social-media-video-downloader - YouTube endpoint ----
-  const ytId = extractYoutubeId(url);
-  if (ytId) {
-    try {
-      const r = await fetch(
-        `https://social-media-video-downloader.p.rapidapi.com/youtube/v3/video/details?videoId=${ytId}&urlAccess=normal&renderableFormats=720p,360p&getTranscript=false`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-rapidapi-host': 'social-media-video-downloader.p.rapidapi.com',
-            'x-rapidapi-key': KEY,
-          },
-          signal: AbortSignal.timeout(25000),
-        }
-      );
-
-      const d = await r.json();
-      console.log('YouTube API response:', JSON.stringify(d).slice(0, 400));
-
-      // ابحث عن رابط الفيديو في الـ response
-      const formats = d.formats || d.streamingData?.formats || d.streamingData?.adaptiveFormats || [];
-      const videoUrl =
-        formats.find((f) => f.qualityLabel === '720p')?.url ||
-        formats.find((f) => f.qualityLabel === '360p')?.url ||
-        formats[0]?.url ||
-        d.url ||
-        d.videoUrl;
-
-      if (videoUrl) {
-        return res.status(200).json({
-          status: 'redirect',
-          url: videoUrl,
-          title: d.title || d.videoDetails?.title || '',
-          thumbnail: d.thumbnail || d.videoDetails?.thumbnail?.thumbnails?.[0]?.url || '',
-        });
-      }
-    } catch (e) {
-      console.warn('YouTube API failed:', e.message);
-    }
-  }
-
-  // ---- Backup: TikTok & Instagram & others via coder2077 API ----
   try {
-    const r2 = await fetch(
-      `https://instagram-tiktok-youtube-downloader.p.rapidapi.com/index?url=${encodeURIComponent(url)}`,
+    const r = await fetch(
+      `https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink?url=${encodeURIComponent(url)}`,
       {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'instagram-tiktok-youtube-downloader.p.rapidapi.com',
+          'x-rapidapi-host': 'auto-download-all-in-one.p.rapidapi.com',
           'x-rapidapi-key': KEY,
         },
-        signal: AbortSignal.timeout(20000),
+        signal: AbortSignal.timeout(25000),
       }
     );
 
-    const d2 = await r2.json();
-    console.log('Backup API response:', JSON.stringify(d2).slice(0, 400));
+    const d = await r.json();
+    console.log('API response:', JSON.stringify(d).slice(0, 500));
 
-    const videoUrl =
-      d2.url ||
-      d2.video ||
-      d2.medias?.[0]?.url ||
-      d2.links?.[0]?.url ||
-      d2.data?.play ||
-      d2.data?.hdplay;
+    if (!r.ok) {
+      return res.status(502).json({ error: d.message || 'خطأ من الخادم' });
+    }
+
+    // الـ API ترجع medias array
+    const medias = d.medias || [];
+    const best =
+      medias.find((m) => m.quality === 'hd') ||
+      medias.find((m) => m.quality === 'sd') ||
+      medias.find((m) => m.url) ||
+      medias[0];
+
+    const videoUrl = best?.url || d.url;
 
     if (videoUrl) {
       return res.status(200).json({
         status: 'redirect',
         url: videoUrl,
-        title: d2.title || '',
-        thumbnail: d2.thumbnail || d2.cover || '',
+        title: d.title || '',
+        thumbnail: d.thumbnail || best?.thumbnail || '',
       });
     }
-  } catch (e) {
-    console.warn('Backup API failed:', e.message);
-  }
 
-  return res.status(502).json({
-    error: 'تعذّر تنزيل الفيديو. تأكد من صحة الرابط أو حاول مرة أخرى.',
-  });
+    return res.status(502).json({ error: 'لم يُعثر على رابط الفيديو' });
+
+  } catch (e) {
+    console.error('API error:', e.message);
+    return res.status(502).json({ error: 'تعذّر تنزيل الفيديو. تأكد من صحة الرابط أو حاول مرة أخرى.' });
+  }
 };
