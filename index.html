@@ -3,245 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Video Downloader</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Sora:wght@400;600&display=swap" rel="stylesheet">
+<title>Video Downloader Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Sora:wght@600&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#07070f;--card:#0e0e1c;--card2:#14142a;
-  --border:rgba(255,255,255,0.07);
-  --accent:#60a5fa;--text:#eef0fb;--muted:rgba(238,240,251,0.42);
-  --success:#6ee7b7;--error:#fca5a5;--warn:#fcd34d;
-}
-body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px}
-body::before{content:'';position:fixed;top:-200px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(96,165,250,0.06) 0%,transparent 65%);pointer-events:none}
-body::after{content:'';position:fixed;bottom:-200px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(167,139,250,0.06) 0%,transparent 65%);pointer-events:none}
-.container{width:100%;max-width:480px;position:relative;z-index:1}
-
-/* Header */
-.header{text-align:center;margin-bottom:28px}
-.logo-wrap{display:inline-flex;width:66px;height:66px;border-radius:22px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 0 40px rgba(96,165,250,0.18)}
-h1{font-family:'Sora',sans-serif;font-size:22px;font-weight:600;margin-bottom:4px}
-.subtitle{font-size:13px;color:var(--muted)}
-.badges{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-.badge{display:flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;font-size:11.5px;color:var(--muted)}
-.badge svg{width:12px;height:12px;flex-shrink:0}
-.badge.yt{border-color:rgba(255,60,60,0.4);color:#ff5555;background:rgba(255,0,0,0.05)}
-.badge.ig{border-color:rgba(225,48,108,0.4);color:#e1306c;background:rgba(225,48,108,0.05)}
-.badge.tt{border-color:rgba(200,200,200,0.3);color:#ccc;background:rgba(255,255,255,0.04)}
-
-/* Status bar */
-.status-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;margin-bottom:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;font-size:12px;color:var(--muted)}
-.dot{width:8px;height:8px;border-radius:50%;background:#444;flex-shrink:0;transition:background 0.3s}
-.dot.green{background:#6ee7b7}.dot.amber{background:#fcd34d}.dot.red{background:#fca5a5}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-.dot.loading{background:#60a5fa;animation:pulse 1s infinite}
-
-/* Card */
-.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:22px 18px;margin-bottom:12px}
-
-/* Input */
-.input-wrap{position:relative;margin-bottom:12px}
-.url-icon{position:absolute;right:13px;top:50%;transform:translateY(-50%);opacity:0.35;pointer-events:none;display:flex;align-items:center}
-.paste-btn{position:absolute;left:9px;top:50%;transform:translateY(-50%);padding:6px 12px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.15);border-radius:9px;color:var(--accent);font-size:11px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:background 0.2s}
-.paste-btn:hover{background:rgba(96,165,250,0.18)}
-input[type=text]{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:14px 42px 14px 68px;font-size:13px;font-family:'Sora',sans-serif;color:var(--text);outline:none;transition:border-color 0.2s;direction:ltr;text-align:left}
-input[type=text]::placeholder{color:var(--muted);font-family:'Tajawal',sans-serif;direction:rtl;text-align:right}
-input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
-
-/* Quality */
-.q-row{display:flex;gap:6px;margin-bottom:12px}
-.qb{flex:1;padding:8px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:11.5px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all 0.2s}
-.qb.sel{background:rgba(96,165,250,0.1);border-color:var(--accent);color:var(--accent);font-weight:700}
-
-/* Download button */
-.dl-btn{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#7c3aed);border:none;border-radius:13px;color:white;font-size:16px;font-family:'Tajawal',sans-serif;font-weight:700;cursor:pointer;transition:opacity 0.2s,transform 0.15s;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 24px rgba(59,130,246,0.18)}
-.dl-btn:hover{opacity:0.9}.dl-btn:active{transform:scale(0.975)}.dl-btn:disabled{opacity:0.35;cursor:not-allowed;box-shadow:none}
-
-/* Notification */
-.notif{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:13px;display:none;align-items:flex-start;gap:9px;line-height:1.55}
-.notif.load{display:flex;background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);color:var(--accent)}
-.notif.ok{display:flex;background:rgba(110,231,183,0.07);border:1px solid rgba(110,231,183,0.2);color:var(--success)}
-.notif.err{display:flex;background:rgba(252,165,165,0.07);border:1px solid rgba(252,165,165,0.2);color:var(--error)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spin{width:16px;height:16px;min-width:16px;border:2px solid rgba(96,165,250,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
-
-/* Result Area */
-.result-area{margin-top:10px; display: flex; flex-direction: column; gap: 8px;}
-.dl-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(110,231,183,0.07);border:1px solid rgba(110,231,183,0.22);border-radius:12px;color:var(--success);text-decoration:none;font-size:14px;font-weight:700; transition: 0.2s;}
-.dl-link:hover{background:rgba(110,231,183,0.13)}
-.album-btn { background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.25); color: var(--accent); cursor: pointer; }
-.album-btn:hover { background: rgba(96, 165, 250, 0.18); }
-.tip-box{margin-top:8px;padding:10px 13px;background:rgba(252,211,77,0.06);border:1px solid rgba(252,211,77,0.18);border-radius:10px;font-size:11.5px;color:var(--warn);line-height:1.65}
-
-/* Picker */
-.picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.pitem{display:block;padding:10px;background:var(--card2);border:1px solid var(--border);border-radius:11px;text-align:center;text-decoration:none;color:var(--text);transition:border-color 0.2s}
-.pitem:hover{border-color:var(--accent)}
-.pitem img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;margin-bottom:6px}
-.pitem-lbl{font-size:11px;color:var(--muted)}
-
-.foot{text-align:center;font-size:11.5px;color:var(--muted);line-height:1.7}
+    :root { --bg:#07070f; --card:#0e0e1c; --accent:#60a5fa; --text:#eef0fb; --border:rgba(255,255,255,0.07); --success:#6ee7b7; }
+    body { background:var(--bg); color:var(--text); font-family:'Tajawal',sans-serif; display:flex; flex-direction:column; align-items:center; padding:32px 16px; min-height:100vh; }
+    .container { width:100%; max-width:480px; z-index:1; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:24px; padding:20px; margin-top:20px; }
+    input[type=text] { width:100%; background:#14142a; border:1px solid var(--border); border-radius:12px; padding:15px; color:#fff; outline:none; margin-bottom:12px; direction:ltr; }
+    .dl-btn { width:100%; padding:15px; background:linear-gradient(135deg,#3b82f6,#7c3aed); border:none; border-radius:12px; color:white; font-weight:700; cursor:pointer; }
+    .notif { margin-top:12px; padding:12px; border-radius:10px; display:none; font-size:13px; }
+    .result-area { margin-top:15px; display:flex; flex-direction:column; gap:10px; }
+    .dl-link { display:flex; align-items:center; justify-content:center; padding:12px; background:rgba(110,231,183,0.1); border:1px solid var(--success); border-radius:12px; color:var(--success); text-decoration:none; font-weight:700; }
+    .album-btn { background:rgba(96,165,250,0.1); border:1px solid var(--accent); color:var(--accent); cursor:pointer; font-family:'Tajawal'; }
+    .picker-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; }
+    .pitem { background:#14142a; padding:8px; border-radius:12px; text-align:center; }
+    .pitem img { width:100%; border-radius:8px; aspect-ratio:1/1; object-fit:cover; }
+    .spin { width:16px; height:16px; border:2px solid #60a5fa33; border-top-color:#60a5fa; border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
 <div class="container">
-
-  <div class="header">
-    <div class="logo-wrap">
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <polyline points="7 10 12 15 17 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <line x1="12" y1="15" x2="12" y2="3" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      </svg>
+    <h1 style="text-align:center; font-family:'Sora';">Video Downloader</h1>
+    <div class="card">
+        <input type="text" id="urlIn" placeholder="الصق الرابط هنا (TikTok, IG, YT)">
+        <button class="dl-btn" id="dlBtn" onclick="go()">جلب المحتوى</button>
+        <div id="notif" class="notif"></div>
+        <div id="result" class="result-area"></div>
+        <div id="picker" class="picker-grid" style="display:none"></div>
     </div>
-    <h1>Video Downloader</h1>
-    <p class="subtitle">حمّل من أي منصة · بدون علامة مائية</p>
-    <div class="badges">
-      <div class="badge yt">YouTube</div>
-      <div class="badge ig">Instagram</div>
-      <div class="badge tt">TikTok</div>
-    </div>
-  </div>
-
-  <div class="status-bar">
-    <div class="dot green" id="dot"></div>
-    <span id="statusTxt">جاهز للتنزيل</span>
-  </div>
-
-  <div class="card">
-    <div class="input-wrap">
-      <input type="text" id="urlIn" placeholder="الصق رابط الفيديو هنا" autocomplete="off">
-      <button class="paste-btn" onclick="doPaste()">لصق</button>
-    </div>
-
-    <div class="q-row" id="qRow" style="display:none">
-      <button class="qb sel" onclick="setQ(this,'1080')">1080p</button>
-      <button class="qb" onclick="setQ(this,'720')">720p</button>
-      <button class="qb" onclick="setQ(this,'480')">480p</button>
-    </div>
-
-    <button class="dl-btn" id="dlBtn" onclick="go()">
-      تنزيل الفيديو
-    </button>
-
-    <div class="notif" id="notif"></div>
-    <div class="result-area" id="result"></div>
-    <div class="picker-grid" id="picker" style="display:none"></div>
-  </div>
 </div>
 
 <script>
-var API_BASE = window.location.origin;
-var Q = '1080';
+    var API_BASE = window.location.origin;
 
-function detect(u) {
-  if (/youtube\.com|youtu\.be/.test(u)) return 'yt';
-  return null;
-}
-
-document.getElementById('urlIn').addEventListener('input', function () {
-  var p = detect(this.value);
-  document.getElementById('qRow').style.display = p === 'yt' ? 'flex' : 'none';
-});
-
-async function doPaste() {
-  try {
-    var t = await navigator.clipboard.readText();
-    document.getElementById('urlIn').value = t;
-    document.getElementById('urlIn').dispatchEvent(new Event('input'));
-  } catch (e) { document.getElementById('urlIn').focus(); }
-}
-
-function setQ(btn, q) {
-  Q = q;
-  document.querySelectorAll('.qb').forEach(b => b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-
-function showNotif(type, html) {
-  var el = document.getElementById('notif');
-  el.className = 'notif ' + type;
-  el.innerHTML = html;
-}
-
-// الوظيفة الأساسية للحفظ في الألبوم (تعمل عبر البروكسي لضمان وجود الفيديو والصوت)
-async function saveToAlbum(videoUrl) {
-  const btn = document.getElementById('albumBtn');
-  const originalHtml = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = 'جاري التجهيز للألبوم...';
-
-  try {
-    // نستخدم البروكسي لطلب الملف كـ Blob لضمان تجاوز قيود المتصفح
-    const proxyUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(videoUrl);
-    const resp = await fetch(proxyUrl);
-    const blob = await resp.blob();
-    
-    // إنشاء ملف من الـ Blob
-    const file = new File([blob], "video.mp4", { type: "video/mp4" });
-
-    // التأكد من دعم المشاركة للملفات
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        files: [file],
-        title: 'حفظ الفيديو',
-      });
-    } else {
-      alert("عذراً، متصفحك لا يدعم الحفظ المباشر للألبوم. استخدم زر التنزيل العادي.");
+    function showNotif(msg, type) {
+        const n = document.getElementById('notif');
+        n.style.display = 'block';
+        n.style.background = type === 'err' ? '#fca5a522' : '#60a5fa22';
+        n.innerHTML = msg;
     }
-  } catch (err) {
-    alert("حدث خطأ أثناء تجهيز الفيديو للألبوم.");
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = originalHtml;
-  }
-}
 
-async function go() {
-  var url = document.getElementById('urlIn').value.trim();
-  if (!url) { showNotif('err', '⚠ الرجاء إدخال رابط الفيديو'); return; }
-
-  var btn = document.getElementById('dlBtn');
-  btn.disabled = true;
-  document.getElementById('result').innerHTML = '';
-  showNotif('load', '<div class="spin"></div> جارٍ جلب الفيديو...');
-
-  try {
-    var response = await fetch(API_BASE + '/api/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: url, videoQuality: Q })
-    });
-
-    var data = await response.json();
-
-    if (!response.ok || data.error) {
-      showNotif('err', '✕ ' + (data.error || 'خطأ في الجلب'));
-    } else if (data.url) {
-      showNotif('ok', '✓ جاهز!');
-      
-      // نستخدم رابط البروكسي للتنزيل العادي لضمان الفيديو+الصوت
-      var finalUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(data.url);
-      
-      document.getElementById('result').innerHTML = `
-        <a href="${finalUrl}" download="video.mp4" class="dl-link">
-          <span>تنزيل للملفات (فيديو كامل)</span>
-        </a>
-        <button id="albumBtn" class="dl-link album-btn" onclick="saveToAlbum('${data.url}')">
-          <span>تنزيل للألبوم (iPhone)</span>
-        </button>
-        <div class="tip-box">ملاحظة: زر الألبوم يحتاج وقت للتجهيز، ثم اختر "Save Video".</div>
-      `;
+    async function saveToAlbum(videoUrl) {
+        const btn = document.getElementById('albumBtn');
+        btn.innerHTML = '<span class="spin"></span> جاري التجهيز...';
+        try {
+            const proxyUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(videoUrl);
+            const resp = await fetch(proxyUrl);
+            const blob = await resp.blob();
+            const file = new File([blob], "video.mp4", { type: "video/mp4" });
+            if (navigator.share) {
+                await navigator.share({ files: [file] });
+            } else { alert("متصفحك لا يدعم الحفظ المباشر."); }
+        } catch (e) { alert("خطأ في الحفظ"); }
+        btn.innerHTML = "حفظ في الألبوم (iPhone)";
     }
-  } catch (err) {
-    showNotif('err', '✕ خطأ في الشبكة');
-  } finally {
-    btn.disabled = false;
-  }
-}
+
+    async function go() {
+        const url = document.getElementById('urlIn').value.trim();
+        if(!url) return showNotif("الرجاء وضع رابط", "err");
+        
+        document.getElementById('dlBtn').disabled = true;
+        document.getElementById('result').innerHTML = '';
+        document.getElementById('picker').style.display = 'none';
+        showNotif('<span class="spin"></span> جاري البحث...', 'load');
+
+        try {
+            const res = await fetch(API_BASE + '/api/download', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ url })
+            });
+            const data = await res.json();
+
+            if(data.status === 'picker') {
+                showNotif("تم العثور على صور", "ok");
+                let h = '';
+                data.picker.forEach(img => {
+                    const pImg = API_BASE + '/api/proxy?url=' + encodeURIComponent(img.url);
+                    h += `<div class="pitem"><img src="${pImg}"><a href="${pImg}" download class="dl-link" style="margin-top:5px; padding:5px; font-size:12px;">حفظ</a></div>`;
+                });
+                document.getElementById('picker').innerHTML = h;
+                document.getElementById('picker').style.display = 'grid';
+            } else if (data.url) {
+                showNotif("جاهز للتحميل", "ok");
+                const finalUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(data.url);
+                document.getElementById('result').innerHTML = `
+                    <a href="${finalUrl}" download="video.mp4" class="dl-link">تنزيل الفيديو (للملفات)</a>
+                    <button id="albumBtn" class="dl-link album-btn" onclick="saveToAlbum('${data.url}')">حفظ في الألبوم (iPhone)</button>
+                `;
+            } else { showNotif("فشل العثور على محتوى", "err"); }
+        } catch (e) { showNotif("خطأ في الاتصال", "err"); }
+        document.getElementById('dlBtn').disabled = false;
+    }
 </script>
 </body>
 </html>
