@@ -10,42 +10,50 @@ module.exports = async function handler(req, res) {
   if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
   try {
-    // خطوة فك الرابط المختصر (عشان يشتغل الرابط اللي أرسلته)
-    const response = await fetch(url, {
+    // إجبار السيرفر على جلب الرابط الحقيقي من الرابط المختصر
+    const headResponse = await fetch(url, {
       method: 'GET',
       redirect: 'follow',
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
     });
-    const finalUrl = response.url;
+    
+    const longUrl = headResponse.url; // الرابط الطويل بعد الفك
 
-    // طلب البيانات من API التنزيل
-    const r = await fetch('https://www.tikwm.com/api/', {
+    // إرسال الرابط الطويل للـ API
+    const tikRes = await fetch('https://www.tikwm.com/api/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ url: finalUrl, hd: '1' }),
+      body: new URLSearchParams({ url: longUrl, hd: '1' }),
     });
 
-    const d = await r.json();
+    const result = await tikRes.json();
 
-    if (d.code === 0 && d.data) {
-      const data = d.data;
+    if (result.code === 0 && result.data) {
+      const d = result.data;
 
-      // إذا كان الرابط "صور" Slideshow
-      if (data.images && data.images.length > 0) {
+      // إذا كان صور (Slideshow)
+      if (d.images && d.images.length > 0) {
         return res.status(200).json({
           status: 'picker',
-          picker: data.images.map(img => ({ url: img }))
+          picker: d.images.map(img => ({ url: img }))
         });
       }
 
-      // إذا كان فيديو
-      const videoUrl = data.hdplay || data.play;
-      if (videoUrl) {
-        return res.status(200).json({ status: 'success', url: videoUrl });
+      // إذا كان فيديو (سواء قصير أو طويل)
+      const video = d.hdplay || d.play;
+      if (video) {
+        return res.status(200).json({
+          status: 'success',
+          url: video
+        });
       }
     }
-    return res.status(404).json({ error: 'لم يتم العثور على محتوى' });
+    
+    return res.status(404).json({ error: 'لم نتمكن من استخراج الفيديو، تأكد من أن الحساب ليس خاصاً' });
+
   } catch (e) {
-    return res.status(500).json({ error: 'حدث خطأ في السيرفر' });
+    return res.status(500).json({ error: 'خطأ في معالجة الرابط القصير' });
   }
 };
