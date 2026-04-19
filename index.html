@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TikTok Downloader | محمل التيك توك الذكي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Video Downloader Pro | محمل الفيديوهات الذكي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --accent: #7c3aed;
-            --bg: #07070f;
-            --card-bg: #0e0e1c;
-            --input-bg: #14142a;
+            --bg: #0b0b14;
+            --card: #161625;
+            --accent: #3b82f6;
+            --accent-grad: linear-gradient(135deg, #3b82f6, #8b5cf6);
             --text: #ffffff;
-            --success: #22c55e;
-            --error: #fca5a5;
+            --text-dim: #a0a0b8;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -26,94 +24,93 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 20px;
         }
 
-        .container { width: 100%; max-width: 480px; }
+        .container { width: 100%; max-width: 450px; margin-top: 40px; }
 
         .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-size: 26px; font-weight: 700; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .header p { color: #888; font-size: 14px; margin-top: 5px; }
+        .header h1 { font-size: 28px; letter-spacing: -1px; margin-bottom: 8px; background: var(--accent-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: var(--text-dim); font-size: 14px; }
 
         .card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 24px;
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            background: var(--card);
+            border-radius: 28px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
 
-        .input-group { margin-bottom: 15px; position: relative; }
-        input {
+        .input-box {
             width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid #2d2d44;
-            background: var(--input-bg);
+            padding: 18px;
+            border-radius: 16px;
+            border: 2px solid #252538;
+            background: #1e1e30;
             color: #fff;
             font-size: 16px;
+            margin-bottom: 15px;
             outline: none;
             transition: 0.3s;
             text-align: left;
             direction: ltr;
         }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.15); }
-        input::placeholder { text-align: right; direction: rtl; color: #555; }
+        .input-box:focus { border-color: var(--accent); background: #22223d; }
+        .input-box::placeholder { text-align: right; direction: rtl; color: #666; }
 
-        .btn-main {
+        .main-btn {
             width: 100%;
-            padding: 16px;
-            border-radius: 14px;
+            padding: 18px;
+            border-radius: 16px;
             border: none;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: var(--accent-grad);
             color: #fff;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 17px;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
         }
-        .btn-main:active { transform: scale(0.97); }
-        .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
+        .main-btn:active { transform: scale(0.97); }
+        .main-btn:disabled { opacity: 0.6; filter: grayscale(1); }
 
-        #status { margin-top: 15px; font-size: 14px; text-align: center; display: none; }
+        #status { margin-top: 15px; font-size: 14px; text-align: center; display: none; color: var(--accent); }
 
         /* منطقة المعاينة */
-        .preview-container {
-            margin-top: 20px;
+        #previewWrap {
+            margin-top: 25px;
             display: none;
             background: #000;
-            border-radius: 18px;
+            border-radius: 20px;
             overflow: hidden;
             border: 1px solid #333;
-            position: relative;
+            line-height: 0;
         }
-        video { width: 100%; max-height: 450px; display: block; background: #000; }
+        video { width: 100%; max-height: 450px; display: block; }
 
-        .actions { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .btn-action {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 14px;
-            border-radius: 12px;
+        .action-btns { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .btn-link {
+            width: 100%;
+            padding: 15px;
+            border-radius: 14px;
             text-decoration: none;
+            text-align: center;
             font-weight: 700;
             font-size: 15px;
-            border: 1px solid transparent;
-            cursor: pointer;
+            display: block;
+            border: 1px solid rgba(255,255,255,0.1);
             transition: 0.2s;
         }
-        .btn-save { background: rgba(34, 197, 94, 0.1); color: var(--success); border-color: rgba(34, 197, 94, 0.2); }
-        .btn-download { background: rgba(255, 255, 255, 0.05); color: #ccc; border-color: rgba(255,255,255,0.1); }
-
-        .picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .picker-item { background: var(--input-bg); padding: 5px; border-radius: 12px; border: 1px solid #333; }
-        .picker-item img { width: 100%; border-radius: 8px; display: block; }
+        .btn-save { background: #22c55e; color: #fff; }
+        .btn-raw { background: rgba(255,255,255,0.05); color: #ccc; }
 
         .loader { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-left: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .grid-item { background: #1e1e30; padding: 5px; border-radius: 12px; border: 1px solid #333; }
+        .grid-item img { width: 100%; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -121,122 +118,112 @@
     <div class="container">
         <div class="header">
             <h1>Video Downloader</h1>
-            <p>تنزيل فيديوهات وصور تيك توك بدون علامة مائية</p>
+            <p>تنزيل فيديوهات تيك توك بجودة عالية وبدون علامة</p>
         </div>
 
         <div class="card">
-            <div class="input-group">
-                <input type="text" id="urlInput" placeholder="الصق الرابط (vt.tiktok.com)">
-            </div>
-            
-            <button class="btn-main" id="fetchBtn" onclick="process()">
-                <span id="btnText">جلب المحتوى والمعاينة</span>
+            <input type="text" id="urlInput" placeholder="أدخل رابط vt.tiktok.com هنا...">
+            <button class="main-btn" id="goBtn" onclick="startDownload()">
+                <span>جلب الفيديو والمعاينة</span>
             </button>
 
             <div id="status"></div>
 
-            <div id="previewArea" class="preview-container">
-                <video id="player" controls playsinline preload="metadata"></video>
+            <div id="previewWrap">
+                <video id="player" controls playsinline preload="auto"></video>
             </div>
 
-            <div id="actionArea" class="actions"></div>
+            <div id="resultActions" class="action-btns"></div>
 
-            <div id="imagePicker" class="picker-grid" style="display: none;"></div>
+            <div id="imageGrid" class="grid" style="display: none;"></div>
         </div>
     </div>
 
     <script>
-        const BASE_URL = window.location.origin;
+        const API_ROOT = window.location.origin;
 
-        async function process() {
+        async function startDownload() {
             const input = document.getElementById('urlInput');
             const url = input.value.trim();
-            if (!url) return alert("الرجاء إدخال الرابط");
+            if (!url) return alert("يرجى لصق الرابط");
 
-            const btn = document.getElementById('fetchBtn');
+            const btn = document.getElementById('goBtn');
             const status = document.getElementById('status');
-            const preview = document.getElementById('previewArea');
+            const preview = document.getElementById('previewWrap');
             const player = document.getElementById('player');
-            const actions = document.getElementById('actionArea');
-            const picker = document.getElementById('imagePicker');
+            const actions = document.getElementById('resultActions');
+            const grid = document.getElementById('imageGrid');
 
-            // إعادة تعيين الواجهة
+            // Reset UI
             btn.disabled = true;
             status.style.display = 'block';
-            status.style.color = 'var(--primary)';
-            status.innerHTML = '<span class="loader"></span> جاري معالجة الرابط وفك التشفير...';
+            status.innerHTML = '<span class="loader"></span> جاري الاتصال بالمحرك العالمي...';
             preview.style.display = 'none';
             actions.innerHTML = '';
-            picker.innerHTML = '';
-            picker.style.display = 'none';
+            grid.innerHTML = '';
+            grid.style.display = 'none';
             player.src = '';
 
             try {
-                const response = await fetch(`${BASE_URL}/api/download`, {
+                const res = await fetch(`${API_ROOT}/api/download`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ url })
                 });
-                const data = await response.json();
+                const data = await res.json();
 
                 if (data.status === 'success' && data.url) {
                     status.innerHTML = '✓ تم جلب الفيديو بنجاح';
-                    const proxyUrl = `${BASE_URL}/api/proxy?url=${encodeURIComponent(data.url)}`;
                     
-                    // إعداد المعاينة
-                    player.src = proxyUrl;
+                    // استخدام البروكسي المحلي لتشغيل الفيديو (حل مشكلة الآيفون)
+                    const finalProxy = `${API_ROOT}/api/proxy?url=${encodeURIComponent(data.url)}`;
+                    
+                    player.src = finalProxy;
                     preview.style.display = 'block';
                     player.load();
 
-                    // إضافة الأزرار
                     actions.innerHTML = `
-                        <button onclick="saveVideo('${data.url}')" class="btn-action btn-save">حفظ في الألبوم (iPhone)</button>
-                        <a href="${proxyUrl}" download="tiktok_video.mp4" class="btn-action btn-download">تنزيل كملف مباشر</a>
+                        <button onclick="downloadProcess('${data.url}')" class="btn-link btn-save">حفظ الفيديو في الألبوم (iPhone)</button>
+                        <a href="${finalProxy}" download="video.mp4" class="btn-link btn-raw">تنزيل مباشر</a>
                     `;
                 } else if (data.status === 'picker') {
                     status.innerHTML = '✓ تم العثور على مجموعة صور:';
-                    picker.style.display = 'grid';
+                    grid.style.display = 'grid';
                     data.picker.forEach(item => {
-                        const imgProxy = `${BASE_URL}/api/proxy?url=${encodeURIComponent(item.url)}`;
-                        picker.innerHTML += `
-                            <div class="picker-item">
-                                <img src="${imgProxy}">
-                                <a href="${imgProxy}" download class="btn-action btn-download" style="padding: 6px; font-size: 11px; margin-top: 5px;">حفظ الصورة</a>
+                        const imgUrl = `${API_ROOT}/api/proxy?url=${encodeURIComponent(item.url || item)}`;
+                        grid.innerHTML += `
+                            <div class="grid-item">
+                                <img src="${imgUrl}">
+                                <a href="${imgUrl}" download class="btn-link btn-raw" style="font-size:12px; padding:8px; margin-top:5px">حفظ</a>
                             </div>`;
                     });
                 } else {
-                    status.style.color = 'var(--error)';
-                    status.innerHTML = '✕ فشل العثور على الفيديو. تأكد من الرابط.';
+                    status.innerHTML = '✕ المحرك لم يستطع جلب الرابط، جرب رابطاً آخر.';
                 }
             } catch (err) {
-                status.style.color = 'var(--error)';
-                status.innerHTML = '✕ حدث خطأ في الاتصال بالسيرفر.';
+                status.innerHTML = '✕ فشل الاتصال بالسيرفر، تأكد من الرفع على Vercel.';
             } finally {
                 btn.disabled = false;
             }
         }
 
-        async function saveVideo(rawUrl) {
-            const status = document.getElementById('status');
-            const proxyUrl = `${BASE_URL}/api/proxy?url=${encodeURIComponent(rawUrl)}`;
+        async function downloadProcess(videoUrl) {
+            const proxyUrl = `${API_ROOT}/api/proxy?url=${encodeURIComponent(videoUrl)}`;
             
-            status.innerHTML = '<span class="loader"></span> جاري التحضير للألبوم...';
-
+            // في الآيفون: أفضل طريقة هي فتح البروكسي في نافذة جديدة
+            // سيقوم ملف proxy.js بإرسال Headers تجعل المتصفح يعرض خيار "تنزيل"
             try {
-                const res = await fetch(proxyUrl);
-                const blob = await res.blob();
-                const file = new File([blob], "video.mp4", { type: "video/mp4" });
+                const response = await fetch(proxyUrl);
+                const blob = await response.blob();
+                const file = new File([blob], "tiktok_video.mp4", { type: "video/mp4" });
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({ files: [file] });
-                    status.innerHTML = '✓ اكتملت العملية';
                 } else {
-                    // إذا كان المتصفح لا يدعم المشاركة (مثل داخل تطبيقات)
-                    window.location.href = proxyUrl;
-                    alert("اضغط مطولاً على الفيديو في المعاينة واختر 'حفظ الفيديو'.");
+                    window.open(proxyUrl, '_blank');
                 }
             } catch (e) {
-                window.location.href = proxyUrl;
+                window.open(proxyUrl, '_blank');
             }
         }
     </script>
