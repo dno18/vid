@@ -2,41 +2,49 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Video Downloader | معاينة وتنزيل</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Video Downloader | محمل الفيديو الذكي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
         body { background:#07070f; color:#fff; font-family:'Tajawal', sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
         .container { width:100%; max-width:450px; text-align:center; }
-        .card { background:#0e0e1c; padding:25px; border-radius:24px; border:1px solid rgba(255,255,255,0.1); width:100%; }
-        input { width:100%; padding:15px; border-radius:12px; border:1px solid #333; background:#14142a; color:#fff; margin-bottom:15px; text-align:left; direction:ltr; font-size: 16px; }
-        .dl-btn { width:100%; padding:15px; border-radius:12px; border:none; background:linear-gradient(135deg,#3b82f6,#7c3aed); color:#fff; font-weight:700; cursor:pointer; font-size: 16px; }
+        .card { background:#0e0e1c; padding:25px; border-radius:24px; border:1px solid rgba(255,255,255,0.1); width:100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        /* تجميل مشغل الفيديو */
-        .preview-wrap { margin-top: 20px; display: none; background: #000; border-radius: 15px; overflow: hidden; border: 1px solid #3b82f6; }
-        video { width: 100%; display: block; max-height: 400px; }
+        h1 { margin-bottom: 25px; font-size: 28px; background: linear-gradient(135deg, #fff, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        input { width:100%; padding:16px; border-radius:14px; border:1px solid #2d2d44; background:#14142a; color:#fff; margin-bottom:15px; text-align:left; direction:ltr; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.2); }
+        
+        .dl-btn { width:100%; padding:16px; border-radius:14px; border:none; background:linear-gradient(135deg,#3b82f6,#7c3aed); color:#fff; font-weight:700; cursor:pointer; font-size: 16px; transition: 0.2s; }
+        .dl-btn:active { transform: scale(0.98); }
 
-        .result-area { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
-        .dl-link { padding:12px; background:rgba(96,165,250,0.1); color:#60a5fa; text-decoration:none; border-radius:10px; font-weight:700; border:1px solid rgba(96,165,250,0.2); text-align: center; }
+        /* ستايل المعاينة المعدل للآيفون */
+        .preview-wrap { margin-top: 20px; display: none; background: #000; border-radius: 18px; overflow: hidden; border: 1px solid #333; line-height: 0; }
+        video { width: 100%; max-height: 420px; background: #000; }
+
+        .result-area { margin-top:20px; display:flex; flex-direction:column; gap:12px; }
+        .dl-link { padding:14px; background:rgba(96,165,250,0.1); color:#60a5fa; text-decoration:none; border-radius:12px; font-weight:700; border:1px solid rgba(96,165,250,0.2); text-align: center; font-size: 15px; }
         
-        .spin { width:16px; height:16px; border:2px solid #60a5fa; border-top-color:transparent; border-radius:50%; animation: s 0.7s linear infinite; display:inline-block; vertical-align: middle; margin-left: 5px; }
+        .spin { width:18px; height:18px; border:2px solid #60a5fa; border-top-color:transparent; border-radius:50%; animation: s 0.7s linear infinite; display:inline-block; vertical-align: middle; margin-left: 8px; }
         @keyframes s { to { transform:rotate(360deg); } }
-        #msg { margin-top: 15px; font-size: 14px; }
+        #msg { margin-top: 15px; font-size: 14px; font-weight: 500; }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1 style="margin-bottom:20px">Video Downloader</h1>
+        <h1>Video Downloader</h1>
+        
         <div class="card">
-            <input type="text" id="urlIn" placeholder="الصق الرابط هنا (vt.tiktok)">
+            <input type="text" id="urlIn" placeholder="الصق رابط تيك توك هنا (vt.tiktok)">
             <button class="dl-btn" id="btn" onclick="go()">جلب الفيديو والمعاينة</button>
             
             <div id="msg" style="display:none"></div>
 
             <div id="previewWrap" class="preview-wrap">
-                <video id="videoPlayer" controls playsinline>
-                    Your browser does not support the video tag.
+                <video id="videoPlayer" controls playsinline preload="auto">
+                    متصفحك لا يدعم تشغيل الفيديو.
                 </video>
             </div>
 
@@ -48,8 +56,9 @@
         const API = window.location.origin;
 
         async function go() {
-            const url = document.getElementById('urlIn').value.trim();
-            if(!url) return alert("الرجاء لصق الرابط");
+            const urlIn = document.getElementById('urlIn');
+            const url = urlIn.value.trim();
+            if(!url) return alert("الرجاء لصق الرابط أولاً");
             
             const btn = document.getElementById('btn');
             const msg = document.getElementById('msg');
@@ -57,12 +66,14 @@
             const pWrap = document.getElementById('previewWrap');
             const player = document.getElementById('videoPlayer');
 
+            // تنظيف الواجهة قبل البدء
             btn.disabled = true;
             msg.style.display = 'block';
             msg.style.color = '#60a5fa';
-            msg.innerHTML = '<span class="spin"></span> جاري فك الرابط واستخراج الفيديو...';
+            msg.innerHTML = '<span class="spin"></span> جاري استخراج الفيديو...';
             res.innerHTML = '';
             pWrap.style.display = 'none';
+            player.src = "";
 
             try {
                 const r = await fetch(`${API}/api/download`, {
@@ -73,47 +84,59 @@
                 const data = await r.json();
 
                 if(data.status === 'success' && data.url) {
-                    msg.innerHTML = '✓ تم العثور على الفيديو';
+                    msg.innerHTML = '✓ تم جلب الفيديو بنجاح';
                     
-                    // استخدام البروكسي لعرض الفيديو في المعاينة
+                    // تحويل الرابط عبر البروكسي للمعاينة
                     const proxyUrl = `${API}/api/proxy?url=${encodeURIComponent(data.url)}`;
                     
-                    // إظهار المعاينة
+                    // تشغيل المعاينة (إعدادات خاصة بالآيفون)
                     player.src = proxyUrl;
                     pWrap.style.display = 'block';
-                    
-                    // أزرار التنزيل
+                    player.load(); // إجبار المتصفح على قراءة ملف الفيديو الجديد
+
+                    // أزرار الحفظ والتنزيل
                     res.innerHTML = `
-                        <button onclick="saveToAlbum('${data.url}')" class="dl-link" style="background:#22c55e20; color:#22c55e; border-color:#22c55e; cursor:pointer; width:100%">
+                        <button onclick="saveToAlbum('${data.url}')" id="albumBtn" class="dl-link" style="background:#22c55e15; color:#22c55e; border-color:#22c55e; cursor:pointer; width:100%">
                             حفظ الفيديو في الألبوم (iPhone)
                         </button>
                         <a href="${proxyUrl}" download="video.mp4" class="dl-link">تنزيل كملف مباشر</a>
                     `;
                 } else {
                     msg.style.color = '#fca5a5';
-                    msg.innerHTML = '✕ فشل جلب الفيديو. تأكد أن الحساب ليس خاصاً.';
+                    msg.innerHTML = '✕ فشل العثور على محتوى. تأكد من صحة الرابط.';
                 }
             } catch(e) {
                 msg.style.color = '#fca5a5';
-                msg.innerHTML = '✕ خطأ في الاتصال بالسيرفر.';
+                msg.innerHTML = '✕ حدث خطأ في الاتصال بالسيرفر.';
             } finally {
                 btn.disabled = false;
             }
         }
 
-        async function saveToAlbum(u) {
-            const p = `${API}/api/proxy?url=${encodeURIComponent(u)}`;
+        async function saveToAlbum(videoUrl) {
+            const btn = document.getElementById('albumBtn');
+            const oldText = btn.innerText;
+            btn.innerText = "جاري التحميل للألبوم...";
+            btn.disabled = true;
+
+            const proxyUrl = `${API}/api/proxy?url=${encodeURIComponent(videoUrl)}`;
+
             try {
-                const r = await fetch(p);
+                const r = await fetch(proxyUrl);
                 const b = await r.blob();
-                const f = new File([b], "video.mp4", {type:"video/mp4"});
+                const f = new File([b], "tiktok_video.mp4", {type:"video/mp4"});
+                
                 if(navigator.canShare && navigator.canShare({files:[f]})) {
                     await navigator.share({files:[f]});
                 } else {
-                    alert("اضغط مطولاً على الفيديو في المعاينة واختر حفظ.");
+                    // إذا فشلت المشاركة، نفتح الرابط مباشرة
+                    window.location.href = proxyUrl;
                 }
             } catch(e) {
-                window.location.href = p;
+                window.location.href = proxyUrl;
+            } finally {
+                btn.innerText = oldText;
+                btn.disabled = false;
             }
         }
     </script>
