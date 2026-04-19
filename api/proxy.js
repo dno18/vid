@@ -1,43 +1,25 @@
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-    // 1. استلام الرابط من الطلب
     const { url } = req.query;
-
-    if (!url) {
-        return res.status(400).send('URL required');
-    }
+    if (!url) return res.status(400).send('URL required');
 
     try {
-        // 2. فك ترميز الرابط
-        const targetUrl = decodeURIComponent(url);
-
-        // 3. جلب الفيديو مع إضافة Headers تخدع سيرفر المصدر ليعتقد أن الطلب من متصفح عادي
-        const response = await fetch(targetUrl, {
+        const response = await fetch(decodeURIComponent(url), {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15',
                 'Referer': 'https://www.tiktok.com/'
             }
         });
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch: ${response.statusText}`);
-        }
-
-        // 4. إرسال الـ Headers المناسبة للمتصفح ليتم التعامل معه كفيديو
+        // هذه الإعدادات ضرورية جداً لعمل المعاينة في المتصفح
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-        res.setHeader('Content-Type', response.headers.get('content-type') || 'video/mp4');
-        
-        // لجعل المتصفح يحاول تنزيل الملف بدلاً من مجرد عرضه (اختياري)
-        // res.setHeader('Content-Disposition', 'attachment; filename="video.mp4"');
+        res.setHeader('Content-Type', 'video/mp4');
+        res.setHeader('Accept-Ranges', 'bytes'); 
 
-        // 5. تحويل البيانات المرسلة إلى Buffer وإرسالها
         const buffer = await response.arrayBuffer();
         res.send(Buffer.from(buffer));
-
-    } catch (error) {
-        console.error('Proxy Error:', error);
-        res.status(502).send('خطأ في جلب ملف الفيديو من المصدر');
+    } catch (e) {
+        res.status(502).send('Proxy error');
     }
 };
