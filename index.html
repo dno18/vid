@@ -21,8 +21,7 @@
             align-items: center; justify-content: center; padding: 20px;
         }
         .container { width: 100%; max-width: 480px; position: relative; z-index: 1; }
-        
-        /* Header */
+
         .header { text-align: center; margin-bottom: 28px; }
         .logo-wrap {
             display: inline-flex; width: 66px; height: 66px; border-radius: 22px;
@@ -33,7 +32,6 @@
         h1 { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 600; margin-bottom: 4px; }
         .subtitle { font-size: 13px; color: var(--muted); }
 
-        /* Status bar */
         .status-bar {
             display: flex; align-items: center; gap: 8px; padding: 9px 14px;
             margin-bottom: 12px; background: rgba(255, 255, 255, 0.03);
@@ -41,7 +39,6 @@
         }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #6ee7b7; }
 
-        /* Main Card */
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 22px; margin-bottom: 12px; }
         .input-wrap { position: relative; margin-bottom: 12px; }
         input[type=text] {
@@ -50,14 +47,12 @@
             color: var(--text); outline: none; direction: ltr; text-align: left;
         }
         input[type=text]::placeholder { direction: rtl; text-align: right; color: var(--muted); }
-        
         .paste-btn {
             position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
             padding: 6px 12px; background: rgba(96, 165, 250, 0.1);
             border: 1px solid rgba(96, 165, 250, 0.15); border-radius: 9px;
-            color: var(--accent); font-size: 11px; cursor: pointer;
+            color: var(--accent); font-size: 11px; cursor: pointer; border: none;
         }
-
         .dl-btn {
             width: 100%; padding: 14px; background: linear-gradient(135deg, #3b82f6, #7c3aed);
             border: none; border-radius: 13px; color: white; font-size: 16px;
@@ -65,29 +60,34 @@
         }
         .dl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Notifications & Results */
         .notif { margin-top: 12px; padding: 12px; border-radius: 12px; font-size: 13px; display: none; gap: 8px; align-items: center; }
         .notif.load { display: flex; background: rgba(96, 165, 250, 0.1); color: var(--accent); }
-        .notif.err { display: flex; background: rgba(252, 165, 165, 0.1); color: var(--error); }
-        
+        .notif.err  { display: flex; background: rgba(252, 165, 165, 0.1); color: var(--error); }
+        .notif.ok   { display: flex; background: rgba(110, 231, 183, 0.1); color: var(--success); }
+
         .result-area { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .dl-link {
-            display: flex; align-items: center; justify-content: center; padding: 13px;
-            border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 14px;
+
+        /* أزرار التنزيل */
+        .action-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px; border-radius: 13px; font-weight: 700; font-size: 15px;
+            cursor: pointer; border: none; width: 100%; text-decoration: none;
+            transition: opacity 0.2s;
         }
-        .file-link { background: rgba(110, 231, 183, 0.1); border: 1px solid rgba(110, 231, 183, 0.2); color: var(--success); }
-        .album-btn { background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.2); color: var(--accent); cursor: pointer; width: 100%; }
+        .action-btn:active { opacity: 0.75; }
+        .btn-green  { background: rgba(110, 231, 183, 0.12); border: 1px solid rgba(110, 231, 183, 0.25); color: var(--success); }
+        .btn-blue   { background: rgba(96, 165, 250, 0.12);  border: 1px solid rgba(96, 165, 250, 0.25);  color: var(--accent); }
+        .btn-purple { background: rgba(167, 139, 250, 0.12); border: 1px solid rgba(167, 139, 250, 0.25); color: #c4b5fd; }
 
         .picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .pitem { background: var(--card2); padding: 8px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
         .pitem img { width: 100%; border-radius: 8px; margin-bottom: 8px; aspect-ratio: 1; object-fit: cover; }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        .spin { width: 16px; height: 16px; border: 2px solid rgba(96, 165, 250, 0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .spin { width: 16px; height: 16px; border: 2px solid rgba(96, 165, 250, 0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="header">
         <div class="logo-wrap">
@@ -119,11 +119,12 @@
 
 <script>
     const API_BASE = window.location.origin;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     function showNotif(type, msg) {
         const n = document.getElementById('notif');
         n.className = 'notif ' + type;
-        n.innerHTML = type === 'load' ? `<div class="spin"></div> ${msg}` : msg;
+        n.innerHTML = type === 'load' ? `<div class="spin"></div><span>${msg}</span>` : msg;
         n.style.display = 'flex';
     }
 
@@ -131,42 +132,70 @@
         try {
             const text = await navigator.clipboard.readText();
             document.getElementById('urlIn').value = text;
-        } catch (e) { document.getElementById('urlIn').focus(); }
+        } catch (e) {
+            document.getElementById('urlIn').focus();
+        }
     }
 
-    async function saveToAlbum(videoUrl) {
-        const btn = document.getElementById('albumBtn');
-        const originalText = btn.innerText;
-        btn.innerText = "جاري التحضير...";
-        btn.disabled = true;
+    // ======= طريقة التنزيل الذكية =======
+    async function downloadFile(proxyUrl, filename) {
+        if (isIOS) {
+            // iOS Safari: نفتح في تاب جديد — الـ Content-Disposition header سيجبره على التنزيل
+            window.open(proxyUrl, '_blank');
+        } else {
+            // Android / Desktop: نستخدم blob download
+            try {
+                showNotif('load', 'جاري تحضير الملف...');
+                const res = await fetch(proxyUrl);
+                const blob = await res.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+                showNotif('ok', '✓ بدأ التنزيل');
+            } catch (e) {
+                window.open(proxyUrl, '_blank');
+            }
+        }
+    }
 
+    // ======= حفظ في ألبوم الصور (iOS Share Sheet) =======
+    async function saveToAlbum(videoUrl, btn) {
+        const orig = btn.innerText;
+        btn.innerText = 'جاري التحضير...';
+        btn.disabled = true;
         try {
-            // استخدام البروكسي لتحويل الرابط لملف (Blob)
             const proxyUrl = `${API_BASE}/api/proxy?url=${encodeURIComponent(videoUrl)}`;
             const res = await fetch(proxyUrl);
             const blob = await res.blob();
-            const file = new File([blob], "video.mp4", { type: "video/mp4" });
-
-            // محاولة استخدام ميزة المشاركة في الآيفون
+            const file = new File([blob], 'video.mp4', { type: 'video/mp4' });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file] });
+                await navigator.share({ files: [file], title: 'TikTok Video' });
             } else {
-                window.location.href = proxyUrl; // فتح مباشر إذا فشلت المشاركة
+                window.open(proxyUrl, '_blank');
             }
         } catch (e) {
-            alert("يرجى فتح الموقع في متصفح Safari لحفظ الفيديو في الألبوم.");
+            // المستخدم أغلق الـ share sheet — ليس خطأ حقيقي
+            if (!e.message?.includes('cancel') && !e.message?.includes('abort')) {
+                window.open(`${API_BASE}/api/proxy?url=${encodeURIComponent(videoUrl)}`, '_blank');
+            }
         } finally {
-            btn.innerText = originalText;
+            btn.innerText = orig;
             btn.disabled = false;
         }
     }
 
+    // ======= الدالة الرئيسية =======
     async function go() {
         const url = document.getElementById('urlIn').value.trim();
-        if(!url) return showNotif('err', 'الرجاء لصق الرابط أولاً');
+        if (!url) return showNotif('err', '⚠️ الرجاء لصق الرابط أولاً');
 
-        const btn = document.getElementById('dlBtn');
-        btn.disabled = true;
+        const dlBtn = document.getElementById('dlBtn');
+        dlBtn.disabled = true;
         document.getElementById('result').innerHTML = '';
         document.getElementById('picker').style.display = 'none';
         showNotif('load', 'جاري جلب المحتوى...');
@@ -180,31 +209,45 @@
             const data = await res.json();
 
             if (data.status === 'picker') {
-                showNotif('load', 'تم العثور على مجموعة صور:');
+                showNotif('ok', `✓ تم العثور على ${data.picker.length} صورة`);
                 let h = '';
-                data.picker.forEach(img => {
+                data.picker.forEach((img, i) => {
                     const pUrl = `${API_BASE}/api/proxy?url=${encodeURIComponent(img.url)}`;
-                    h += `<div class="pitem"><img src="${pUrl}"><a href="${pUrl}" download class="dl-link file-link" style="padding:5px;font-size:12px">حفظ الصورة</a></div>`;
+                    h += `
+                        <div class="pitem">
+                            <img src="${pUrl}" loading="lazy">
+                            <button class="action-btn btn-green" style="padding:8px;font-size:12px;margin-top:4px"
+                                onclick="downloadFile('${pUrl}', 'image_${i+1}.jpg')">
+                                حفظ
+                            </button>
+                        </div>`;
                 });
                 document.getElementById('picker').innerHTML = h;
                 document.getElementById('picker').style.display = 'grid';
+
             } else if (data.url) {
-                showNotif('load', '✓ جاهز للتنزيل');
-                const finalProxy = `${API_BASE}/api/proxy?url=${encodeURIComponent(data.url)}`;
+                showNotif('ok', '✓ جاهز للتنزيل');
+                const proxyUrl = `${API_BASE}/api/proxy?url=${encodeURIComponent(data.url)}`;
+
                 document.getElementById('result').innerHTML = `
-                    <a href="${finalProxy}" download="video.mp4" class="dl-link file-link">تنزيل كملف</a>
-                    <button id="albumBtn" class="dl-link album-btn" onclick="saveToAlbum('${data.url}')">حفظ في الألبوم (iPhone)</button>
+                    <button class="action-btn btn-green" onclick="downloadFile('${proxyUrl}', 'video.mp4')">
+                        ⬇️ تنزيل الفيديو
+                    </button>
+                    ${isIOS ? `
+                    <button class="action-btn btn-blue" onclick="saveToAlbum('${data.url}', this)">
+                        📷 حفظ في ألبوم الصور
+                    </button>` : ''}
                 `;
             } else {
-                showNotif('err', 'فشل العثور على الفيديو. تأكد من الرابط.');
+                showNotif('err', '❌ فشل العثور على الفيديو. تأكد من الرابط.');
             }
         } catch (e) {
-            showNotif('err', 'حدث خطأ في الاتصال بالسيرفر.');
+            showNotif('err', '❌ حدث خطأ في الاتصال بالسيرفر.');
+            console.error(e);
         } finally {
-            btn.disabled = false;
+            dlBtn.disabled = false;
         }
     }
 </script>
-
 </body>
 </html>
