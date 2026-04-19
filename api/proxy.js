@@ -12,10 +12,10 @@ module.exports = async (req, res) => {
             }
         });
 
-        // هذه الإعدادات ضرورية جداً لعمل المعاينة في المتصفح
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Content-Type', 'video/mp4');
-        res.setHeader('Accept-Ranges', 'bytes'); 
+        // هذا السطر يخبر الآيفون أن الملف اسمه video.mp4 ويجب تحميله
+        res.setHeader('Content-Disposition', 'attachment; filename="video.mp4"');
 
         const buffer = await response.arrayBuffer();
         res.send(Buffer.from(buffer));
