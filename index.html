@@ -50,11 +50,6 @@ input[type=text]{width:100%;background:var(--card2);border:1px solid var(--borde
 input[type=text]::placeholder{color:var(--muted);font-family:'Tajawal',sans-serif;direction:rtl;text-align:right}
 input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
 
-/* Quality */
-.q-row{display:flex;gap:6px;margin-bottom:12px}
-.qb{flex:1;padding:8px;background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:11.5px;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all 0.2s}
-.qb.sel{background:rgba(96,165,250,0.1);border-color:var(--accent);color:var(--accent);font-weight:700}
-
 /* Download button */
 .dl-btn{width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#7c3aed);border:none;border-radius:13px;color:white;font-size:16px;font-family:'Tajawal',sans-serif;font-weight:700;cursor:pointer;transition:opacity 0.2s,transform 0.15s;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 24px rgba(59,130,246,0.18)}
 .dl-btn:hover{opacity:0.9}.dl-btn:active{transform:scale(0.975)}.dl-btn:disabled{opacity:0.35;cursor:not-allowed;box-shadow:none}
@@ -117,12 +112,6 @@ input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
       <button class="paste-btn" onclick="doPaste()">لصق</button>
     </div>
 
-    <div class="q-row" id="qRow" style="display:none">
-      <button class="qb sel" onclick="setQ(this,'1080')">1080p</button>
-      <button class="qb" onclick="setQ(this,'720')">720p</button>
-      <button class="qb" onclick="setQ(this,'480')">480p</button>
-    </div>
-
     <button class="dl-btn" id="dlBtn" onclick="go()">تنزيل المحتوى</button>
 
     <div class="notif" id="notif"></div>
@@ -134,6 +123,22 @@ input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
 </div>
 
 <script>
+var API_BASE = window.location.origin;
+
+function showNotif(type, html) {
+  var el = document.getElementById('notif');
+  el.className = 'notif ' + type;
+  el.innerHTML = html;
+  el.style.display = 'flex';
+}
+
+async function doPaste() {
+  try {
+    var t = await navigator.clipboard.readText();
+    document.getElementById('urlIn').value = t;
+  } catch (e) { document.getElementById('urlIn').focus(); }
+}
+
 async function saveToAlbum(videoUrl) {
   const btn = document.getElementById('albumBtn');
   const oldText = btn.innerHTML;
@@ -141,31 +146,67 @@ async function saveToAlbum(videoUrl) {
   btn.disabled = true;
 
   try {
-    // نستخدم البروكسي لطلب الفيديو كـ Blob
     const proxyUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(videoUrl);
     const resp = await fetch(proxyUrl);
-    
-    if (!resp.ok) throw new Error('فشل جلب الملف');
-    
+    if (!resp.ok) throw new Error();
     const blob = await resp.blob();
     const file = new File([blob], "video.mp4", { type: "video/mp4" });
 
-    // محاولة استخدام ميزة المشاركة الأصلية (أفضل طريقة للآيفون)
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        files: [file],
-        title: 'حفظ الفيديو',
-      });
+      await navigator.share({ files: [file] });
     } else {
-      // إذا فشلت المشاركة، نفتح الفيديو في نافذة جديدة ليقوم المستخدم بحفظه يدوياً بضغطة مطولة
       window.open(proxyUrl, '_blank');
-      alert("اضغط بشكل مطول على الفيديو ثم اختر 'Save to Photos'");
+      alert("آيفون: اضغط مطولاً على الفيديو واختر حفظ.");
     }
   } catch (err) {
-    console.error(err);
-    alert("حدث خطأ، جرب استخدام زر 'تنزيل للملفات' ثم حفظه للألبوم");
+    alert("حدث خطأ في الحفظ المباشر.");
   } finally {
     btn.innerHTML = oldText;
+    btn.disabled = false;
+  }
+}
+
+async function go() {
+  var url = document.getElementById('urlIn').value.trim();
+  if (!url) { showNotif('err', '⚠ الرجاء إدخال رابط'); return; }
+
+  var btn = document.getElementById('dlBtn');
+  btn.disabled = true;
+  document.getElementById('result').innerHTML = '';
+  document.getElementById('picker').style.display = 'none';
+  showNotif('load', '<div class="spin"></div> جاري البحث...');
+
+  try {
+    var response = await fetch(API_BASE + '/api/download', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url })
+    });
+
+    var data = await response.json();
+
+    if (data.status === 'picker') {
+      showNotif('ok', '✓ تم العثور على صور:');
+      var h = '';
+      data.picker.forEach(item => {
+        var pImg = API_BASE + '/api/proxy?url=' + encodeURIComponent(item.url);
+        h += `<div class="pitem"><img src="${pImg}"><a href="${pImg}" download class="pitem-lbl">حفظ</a></div>`;
+      });
+      document.getElementById('picker').innerHTML = h;
+      document.getElementById('picker').style.display = 'grid';
+    } else if (data.url) {
+      showNotif('ok', '✓ جاهز للتنزيل');
+      var finalUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(data.url);
+      document.getElementById('result').innerHTML = `
+        <a href="${finalUrl}" download="video.mp4" class="dl-link">تنزيل للملفات</a>
+        <button id="albumBtn" class="dl-link album-btn" onclick="saveToAlbum('${data.url}')">حفظ في الألبوم (iPhone)</button>
+      `;
+    } else {
+      showNotif('err', '✕ فشل الجلب');
+    }
+  } catch (err) {
+    showNotif('err', '✕ خطأ في الاتصال');
+  } finally {
     btn.disabled = false;
   }
 }
