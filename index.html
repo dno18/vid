@@ -2,166 +2,58 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TikTok Downloader Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Pro Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #05050a;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.1);
-            --primary: #3b82f6;
-            --accent: #a855f7;
-            --text: #ffffff;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--bg);
-            background-image: radial-gradient(circle at top right, #1e1b4b, transparent), radial-gradient(circle at bottom left, #1e1b4b, transparent);
-            color: var(--text);
-            font-family: 'Tajawal', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container { width: 100%; max-width: 450px; margin-top: 50px; }
-
-        .logo { text-align: center; margin-bottom: 40px; }
-        .logo h1 { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
-        .logo p { color: #64748b; font-size: 14px; margin-top: 8px; }
-
-        .main-card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .input-group { position: relative; margin-bottom: 20px; }
-        input {
-            width: 100%;
-            padding: 18px 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-            text-align: left;
-            direction: ltr;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
-        input::placeholder { text-align: right; direction: rtl; color: #4b5563; }
-
-        .btn-download {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border: none;
-            border-radius: 18px;
-            color: #fff;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
-        }
-        .btn-download:active { transform: scale(0.96); }
-        .btn-download:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        #previewArea {
-            margin-top: 25px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .video-wrapper {
-            width: 100%;
-            border-radius: 20px;
-            overflow: hidden;
-            background: #000;
-            border: 1px solid var(--border);
-            position: relative;
-        }
-        video { width: 100%; display: block; max-height: 400px; }
-
-        .action-btns { margin-top: 20px; display: grid; gap: 12px; }
-        .btn-action {
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 15px;
-            transition: 0.2s;
-            border: 1px solid var(--border);
-        }
-        .btn-save { background: #10b981; color: #fff; border: none; }
-        .btn-share { background: rgba(255,255,255,0.05); color: #fff; }
-
-        .status-msg { margin-top: 15px; text-align: center; font-size: 14px; color: var(--primary); font-weight: 500; display: none; }
-
-        /* Loader */
-        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-left: 10px; }
+        :root { --p: #0070f3; --bg: #000; --card: #111; }
+        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .app { width: 100%; max-width: 450px; text-align: center; }
+        h1 { font-weight: 900; font-size: 32px; background: linear-gradient(to right, #0070f3, #f81ae5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; }
+        .box { background: var(--card); padding: 25px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #333; background: #000; color: #fff; outline: none; transition: 0.3s; margin-bottom: 15px; text-align: center; }
+        input:focus { border-color: var(--p); }
+        button { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--p); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:active { transform: scale(0.96); }
+        #preview { display: none; margin-top: 25px; animation: slideUp 0.5s ease; }
+        video { width: 100%; border-radius: 20px; border: 1px solid #333; background: #000; }
+        .dl-btn { display: block; margin-top: 15px; padding: 15px; background: #fff; color: #000; text-decoration: none; border-radius: 15px; font-weight: 700; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { width: 20px; height: 20px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="logo">
-            <h1>Video Downloader</h1>
-            <p>أسرع طريقة لتنزيل فيديوهات تيك توك بدون علامة</p>
-        </div>
-
-        <div class="main-card">
-            <div class="input-group">
-                <input type="text" id="vUrl" placeholder="الصق الرابط هنا...">
-            </div>
-            
-            <button class="btn-download" id="dlBtn" onclick="handleDownload()">
-                <span id="btnText">جلب الفيديو</span>
-            </button>
-
-            <div id="status" class="status-msg"></div>
-
-            <div id="previewArea">
-                <div class="video-wrapper">
-                    <video id="player" controls playsinline></video>
-                </div>
-                <div class="action-btns" id="actions"></div>
+    <div class="app">
+        <h1>TikTok Pro</h1>
+        <div class="box">
+            <input type="text" id="url" placeholder="ضع رابط الفيديو هنا">
+            <button id="btn" onclick="download()">جلب الفيديو</button>
+            <div id="status" style="margin-top:15px; color:#888; display:none"></div>
+            <div id="preview">
+                <video id="player" controls playsinline></video>
+                <a id="save" class="dl-btn">حفظ الفيديو في الألبوم</a>
             </div>
         </div>
     </div>
 
     <script>
-        async function handleDownload() {
-            const url = document.getElementById('vUrl').value.trim();
-            if(!url) return alert("الرجاء وضع رابط صحيح");
-
-            const btn = document.getElementById('dlBtn');
+        async function download() {
+            const url = document.getElementById('url').value;
+            const btn = document.getElementById('btn');
             const status = document.getElementById('status');
-            const preview = document.getElementById('previewArea');
+            const preview = document.getElementById('preview');
             const player = document.getElementById('player');
-            const actions = document.getElementById('actions');
+            const saveBtn = document.getElementById('save');
+
+            if(!url) return alert("أدخل الرابط!");
 
             btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span>';
             status.style.display = "block";
-            status.innerHTML = '<span class="loader"></span> جاري فك الرابط...';
-            preview.style.display = "none";
+            status.innerHTML = "جاري التحليل وتجاوز القيود...";
 
             try {
-                // الاتصال بملف download.js عبر الـ API
                 const res = await fetch('/api/download', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -170,41 +62,20 @@
                 const data = await res.json();
 
                 if(data.status === 'success') {
-                    status.innerHTML = "✓ تم العثور على الفيديو";
-                    
-                    // استخدام بروكسي المعاينة لتخطي حظر الآيفون
-                    const proxyUrl = `/api/proxy?url=${encodeURIComponent(data.url)}`;
-                    player.src = proxyUrl;
+                    const finalUrl = `/api/proxy?url=${encodeURIComponent(data.url)}`;
+                    player.src = finalUrl;
+                    saveBtn.href = finalUrl;
                     preview.style.display = "block";
-                    player.load();
-
-                    actions.innerHTML = `
-                        <button onclick="saveToPhone('${data.url}')" class="btn-action btn-save">حفظ في الألبوم (iPhone)</button>
-                        <a href="${proxyUrl}" download="video.mp4" class="btn-action btn-share">تنزيل ملف مباشر</a>
-                    `;
+                    status.innerHTML = "✓ تم التجهيز بنجاح";
+                    player.play();
                 } else {
-                    status.innerHTML = "✕ فشل الجلب، جرب رابطاً آخر";
+                    alert("فشل الجلب، جرب رابطاً آخر");
                 }
             } catch(e) {
-                status.innerHTML = "✕ خطأ في الاتصال بالسيرفر";
+                alert("حدث خطأ في السيرفر");
             } finally {
                 btn.disabled = false;
-            }
-        }
-
-        async function saveToPhone(rawUrl) {
-            const p = `/api/proxy?url=${encodeURIComponent(rawUrl)}`;
-            try {
-                const r = await fetch(p);
-                const b = await r.blob();
-                const f = new File([b], "video.mp4", {type:"video/mp4"});
-                if(navigator.canShare && navigator.canShare({files:[f]})) {
-                    await navigator.share({files:[f]});
-                } else {
-                    window.location.href = p;
-                }
-            } catch(e) {
-                window.location.href = p;
+                btn.innerText = "جلب الفيديو";
             }
         }
     </script>
