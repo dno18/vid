@@ -3,93 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>تنزيل فيديوهات تيك توك</title>
+    <title>TikTok Downloader Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Tajawal', sans-serif; }
-        body { background:#0a0a0c; color:#fff; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:20px; }
-        .wrapper { width:100%; max-width:400px; margin-top:50px; }
-        .card { background:#161618; border-radius:25px; padding:25px; border:1px solid #222; box-shadow:0 20px 50px rgba(0,0,0,0.5); }
-        h1 { text-align:center; margin-bottom:20px; font-size:22px; color:#3b82f6; }
-        input { width:100%; padding:15px; border-radius:15px; border:1px solid #333; background:#202022; color:#fff; margin-bottom:15px; outline:none; text-align:left; direction:ltr; }
-        input::placeholder { text-align:right; direction:rtl; }
-        button { width:100%; padding:15px; border-radius:15px; border:none; background:#3b82f6; color:#fff; font-weight:700; cursor:pointer; font-size:16px; transition:0.3s; }
-        button:disabled { background:#555; opacity:0.6; }
-        
-        /* مشغل المعاينة */
-        #previewBox { margin-top:20px; display:none; border-radius:15px; overflow:hidden; border:1px solid #3b82f6; background:#000; }
-        video { width:100%; display:block; max-height:400px; }
-        
-        .status { margin-top:15px; text-align:center; font-size:14px; color:#888; }
-        .actions { margin-top:15px; display:flex; flex-direction:column; gap:10px; }
-        .btn-dl { display:block; text-align:center; padding:12px; border-radius:10px; text-decoration:none; font-weight:700; font-size:14px; background:#22c55e; color:#fff; }
+        :root {
+            --bg: #05050a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --accent: #a855f7;
+            --text: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at top right, #1e1b4b, transparent), radial-gradient(circle at bottom left, #1e1b4b, transparent);
+            color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { width: 100%; max-width: 450px; margin-top: 50px; }
+
+        .logo { text-align: center; margin-bottom: 40px; }
+        .logo h1 { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px; }
+        .logo p { color: #64748b; font-size: 14px; margin-top: 8px; }
+
+        .main-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-group { position: relative; margin-bottom: 20px; }
+        input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+            text-align: left;
+            direction: ltr;
+        }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        input::placeholder { text-align: right; direction: rtl; color: #4b5563; }
+
+        .btn-download {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 18px;
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+        }
+        .btn-download:active { transform: scale(0.96); }
+        .btn-download:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #previewArea {
+            margin-top: 25px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .video-wrapper {
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+        video { width: 100%; display: block; max-height: 400px; }
+
+        .action-btns { margin-top: 20px; display: grid; gap: 12px; }
+        .btn-action {
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: 0.2s;
+            border: 1px solid var(--border);
+        }
+        .btn-save { background: #10b981; color: #fff; border: none; }
+        .btn-share { background: rgba(255,255,255,0.05); color: #fff; }
+
+        .status-msg { margin-top: 15px; text-align: center; font-size: 14px; color: var(--primary); font-weight: 500; display: none; }
+
+        /* Loader */
+        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-left: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <h1>TikTok Downloader</h1>
-    <div class="card">
-        <input type="text" id="urlInput" placeholder="ضع الرابط هنا (vt.tiktok)">
-        <button id="btn" onclick="startDownload()">تنزيل الفيديو</button>
-        
-        <div id="msg" class="status"></div>
-
-        <div id="previewBox">
-            <video id="vPlayer" controls playsinline></video>
+    <div class="container">
+        <div class="logo">
+            <h1>Video Downloader</h1>
+            <p>أسرع طريقة لتنزيل فيديوهات تيك توك بدون علامة</p>
         </div>
 
-        <div id="res" class="actions"></div>
+        <div class="main-card">
+            <div class="input-group">
+                <input type="text" id="vUrl" placeholder="الصق الرابط هنا...">
+            </div>
+            
+            <button class="btn-download" id="dlBtn" onclick="handleDownload()">
+                <span id="btnText">جلب الفيديو</span>
+            </button>
+
+            <div id="status" class="status-msg"></div>
+
+            <div id="previewArea">
+                <div class="video-wrapper">
+                    <video id="player" controls playsinline></video>
+                </div>
+                <div class="action-btns" id="actions"></div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    async function startDownload() {
-        const url = document.getElementById('urlInput').value.trim();
-        const btn = document.getElementById('btn');
-        const msg = document.getElementById('msg');
-        const res = document.getElementById('res');
-        const pBox = document.getElementById('previewBox');
-        const player = document.getElementById('vPlayer');
+    <script>
+        async function handleDownload() {
+            const url = document.getElementById('vUrl').value.trim();
+            if(!url) return alert("الرجاء وضع رابط صحيح");
 
-        if(!url) return alert("أدخل الرابط");
+            const btn = document.getElementById('dlBtn');
+            const status = document.getElementById('status');
+            const preview = document.getElementById('previewArea');
+            const player = document.getElementById('player');
+            const actions = document.getElementById('actions');
 
-        btn.disabled = true;
-        msg.innerHTML = "جاري جلب الفيديو من السيرفر العالمي...";
-        msg.style.display = "block";
-        res.innerHTML = "";
-        pBox.style.display = "none";
+            btn.disabled = true;
+            status.style.display = "block";
+            status.innerHTML = '<span class="loader"></span> جاري فك الرابط...';
+            preview.style.display = "none";
 
-        try {
-            // استخدام API خارجي مباشر لتجنب حظر Vercel (نفس فكرة المواقع الكبيرة)
-            const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`);
-            const json = await response.json();
+            try {
+                // الاتصال بملف download.js عبر الـ API
+                const res = await fetch('/api/download', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ url })
+                });
+                const data = await res.json();
 
-            if(json.code === 0 && json.data) {
-                const videoUrl = json.data.hdplay || json.data.play;
-                
-                // حل مشكلة المعاينة في الآيفون: استخدام بروكسي خارجي عام
-                // هذا يتجاوز حظر أبل للشاشة السوداء
-                const finalUrl = `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=604800&url=${encodeURIComponent(videoUrl)}`;
+                if(data.status === 'success') {
+                    status.innerHTML = "✓ تم العثور على الفيديو";
+                    
+                    // استخدام بروكسي المعاينة لتخطي حظر الآيفون
+                    const proxyUrl = `/api/proxy?url=${encodeURIComponent(data.url)}`;
+                    player.src = proxyUrl;
+                    preview.style.display = "block";
+                    player.load();
 
-                player.src = finalUrl;
-                pBox.style.display = "block";
-                msg.innerHTML = "✓ تم العثور على الفيديو";
-
-                res.innerHTML = `
-                    <a href="${videoUrl}" target="_blank" class="btn-dl">تنزيل بجودة عالية HD</a>
-                    <p style="font-size:10px; color:#555; margin-top:5px; text-align:center;">في آيفون: اضغط مطولاً على الفيديو في المعاينة ثم اختر حفظ</p>
-                `;
-            } else {
-                msg.innerHTML = "✕ فشل الجلب، الرابط قد يكون خاصاً أو معطلاً";
+                    actions.innerHTML = `
+                        <button onclick="saveToPhone('${data.url}')" class="btn-action btn-save">حفظ في الألبوم (iPhone)</button>
+                        <a href="${proxyUrl}" download="video.mp4" class="btn-action btn-share">تنزيل ملف مباشر</a>
+                    `;
+                } else {
+                    status.innerHTML = "✕ فشل الجلب، جرب رابطاً آخر";
+                }
+            } catch(e) {
+                status.innerHTML = "✕ خطأ في الاتصال بالسيرفر";
+            } finally {
+                btn.disabled = false;
             }
-        } catch(e) {
-            msg.innerHTML = "✕ خطأ في الاتصال، جرب مرة أخرى";
-        } finally {
-            btn.disabled = false;
         }
-    }
-</script>
 
+        async function saveToPhone(rawUrl) {
+            const p = `/api/proxy?url=${encodeURIComponent(rawUrl)}`;
+            try {
+                const r = await fetch(p);
+                const b = await r.blob();
+                const f = new File([b], "video.mp4", {type:"video/mp4"});
+                if(navigator.canShare && navigator.canShare({files:[f]})) {
+                    await navigator.share({files:[f]});
+                } else {
+                    window.location.href = p;
+                }
+            } catch(e) {
+                window.location.href = p;
+            }
+        }
+    </script>
 </body>
 </html>
