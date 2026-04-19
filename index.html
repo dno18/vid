@@ -3,32 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Video Downloader</title>
+    <title>Video Downloader | معاينة وتنزيل</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#07070f; color:#fff; font-family:'Tajawal', sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
         .container { width:100%; max-width:450px; text-align:center; }
         .card { background:#0e0e1c; padding:25px; border-radius:24px; border:1px solid rgba(255,255,255,0.1); width:100%; }
-        input { width:100%; padding:15px; border-radius:12px; border:1px solid #333; background:#14142a; color:#fff; margin-bottom:15px; text-align:left; direction:ltr; }
-        .dl-btn { width:100%; padding:15px; border-radius:12px; border:none; background:linear-gradient(135deg,#3b82f6,#7c3aed); color:#fff; font-weight:700; cursor:pointer; }
+        input { width:100%; padding:15px; border-radius:12px; border:1px solid #333; background:#14142a; color:#fff; margin-bottom:15px; text-align:left; direction:ltr; font-size: 16px; }
+        .dl-btn { width:100%; padding:15px; border-radius:12px; border:none; background:linear-gradient(135deg,#3b82f6,#7c3aed); color:#fff; font-weight:700; cursor:pointer; font-size: 16px; }
+        
+        /* تجميل مشغل الفيديو */
+        .preview-wrap { margin-top: 20px; display: none; background: #000; border-radius: 15px; overflow: hidden; border: 1px solid #3b82f6; }
+        video { width: 100%; display: block; max-height: 400px; }
+
         .result-area { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
-        .dl-link { padding:12px; background:rgba(96,165,250,0.1); color:#60a5fa; text-decoration:none; border-radius:10px; font-weight:700; border:1px solid rgba(96,165,250,0.2); }
-        .picker-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; }
-        .pitem img { width:100%; border-radius:10px; }
-        .spin { width:16px; height:16px; border:2px solid #60a5fa; border-top-color:transparent; border-radius:50%; animation: s 0.7s linear infinite; display:inline-block; }
+        .dl-link { padding:12px; background:rgba(96,165,250,0.1); color:#60a5fa; text-decoration:none; border-radius:10px; font-weight:700; border:1px solid rgba(96,165,250,0.2); text-align: center; }
+        
+        .spin { width:16px; height:16px; border:2px solid #60a5fa; border-top-color:transparent; border-radius:50%; animation: s 0.7s linear infinite; display:inline-block; vertical-align: middle; margin-left: 5px; }
         @keyframes s { to { transform:rotate(360deg); } }
+        #msg { margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 style="margin-bottom:20px">Video Downloader</h1>
         <div class="card">
-            <input type="text" id="urlIn" placeholder="الصق رابط تيك توك هنا">
-            <button class="dl-btn" id="btn" onclick="go()">تنزيل المحتوى</button>
-            <div id="msg" style="margin-top:15px; font-size:14px; color:#60a5fa; display:none"></div>
+            <input type="text" id="urlIn" placeholder="الصق الرابط هنا (vt.tiktok)">
+            <button class="dl-btn" id="btn" onclick="go()">جلب الفيديو والمعاينة</button>
+            
+            <div id="msg" style="display:none"></div>
+
+            <div id="previewWrap" class="preview-wrap">
+                <video id="videoPlayer" controls playsinline>
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
             <div id="res" class="result-area"></div>
-            <div id="picker" class="picker-grid" style="display:none"></div>
         </div>
     </div>
 
@@ -37,18 +49,20 @@
 
         async function go() {
             const url = document.getElementById('urlIn').value.trim();
-            if(!url) return alert("أدخل الرابط");
+            if(!url) return alert("الرجاء لصق الرابط");
             
             const btn = document.getElementById('btn');
             const msg = document.getElementById('msg');
             const res = document.getElementById('res');
-            const pick = document.getElementById('picker');
+            const pWrap = document.getElementById('previewWrap');
+            const player = document.getElementById('videoPlayer');
 
             btn.disabled = true;
             msg.style.display = 'block';
-            msg.innerHTML = '<span class="spin"></span> جاري معالجة الرابط القصير...';
+            msg.style.color = '#60a5fa';
+            msg.innerHTML = '<span class="spin"></span> جاري فك الرابط واستخراج الفيديو...';
             res.innerHTML = '';
-            pick.style.display = 'none';
+            pWrap.style.display = 'none';
 
             try {
                 const r = await fetch(`${API}/api/download`, {
@@ -58,29 +72,36 @@
                 });
                 const data = await r.json();
 
-                if(data.status === 'success') {
-                    msg.innerHTML = '✓ جاهز للتنزيل';
+                if(data.status === 'success' && data.url) {
+                    msg.innerHTML = '✓ تم العثور على الفيديو';
+                    
+                    // استخدام البروكسي لعرض الفيديو في المعاينة
                     const proxyUrl = `${API}/api/proxy?url=${encodeURIComponent(data.url)}`;
-                    res.innerHTML = `<a href="${proxyUrl}" download="video.mp4" class="dl-link">تنزيل الفيديو (ملفات)</a>
-                                   <button onclick="share('${data.url}')" class="dl-link" style="background:rgba(110,231,183,0.1); color:#6ee7b7; border-color:#6ee7b7; cursor:pointer">حفظ في الألبوم (iPhone)</button>`;
-                } else if(data.status === 'picker') {
-                    msg.innerHTML = '✓ تم العثور على صور:';
-                    pick.style.display = 'grid';
-                    data.picker.forEach(i => {
-                        const p = `${API}/api/proxy?url=${encodeURIComponent(i.url)}`;
-                        pick.innerHTML += `<div class="pitem"><img src="${p}"><a href="${p}" download class="dl-link" style="font-size:11px; display:block; margin-top:5px">حفظ</a></div>`;
-                    });
+                    
+                    // إظهار المعاينة
+                    player.src = proxyUrl;
+                    pWrap.style.display = 'block';
+                    
+                    // أزرار التنزيل
+                    res.innerHTML = `
+                        <button onclick="saveToAlbum('${data.url}')" class="dl-link" style="background:#22c55e20; color:#22c55e; border-color:#22c55e; cursor:pointer; width:100%">
+                            حفظ الفيديو في الألبوم (iPhone)
+                        </button>
+                        <a href="${proxyUrl}" download="video.mp4" class="dl-link">تنزيل كملف مباشر</a>
+                    `;
                 } else {
-                    msg.innerHTML = '✕ فشل العثور على الفيديو';
+                    msg.style.color = '#fca5a5';
+                    msg.innerHTML = '✕ فشل جلب الفيديو. تأكد أن الحساب ليس خاصاً.';
                 }
             } catch(e) {
-                msg.innerHTML = '✕ خطأ في السيرفر';
+                msg.style.color = '#fca5a5';
+                msg.innerHTML = '✕ خطأ في الاتصال بالسيرفر.';
             } finally {
                 btn.disabled = false;
             }
         }
 
-        async function share(u) {
+        async function saveToAlbum(u) {
             const p = `${API}/api/proxy?url=${encodeURIComponent(u)}`;
             try {
                 const r = await fetch(p);
@@ -88,8 +109,12 @@
                 const f = new File([b], "video.mp4", {type:"video/mp4"});
                 if(navigator.canShare && navigator.canShare({files:[f]})) {
                     await navigator.share({files:[f]});
-                } else { window.location.href = p; }
-            } catch(e) { window.location.href = p; }
+                } else {
+                    alert("اضغط مطولاً على الفيديو في المعاينة واختر حفظ.");
+                }
+            } catch(e) {
+                window.location.href = p;
+            }
         }
     </script>
 </body>
