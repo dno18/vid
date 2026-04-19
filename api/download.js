@@ -7,31 +7,37 @@ module.exports = async (req, res) => {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   
-  const { url } = req.body || {};
-  if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: 'الرابط مفقود' });
 
   try {
-    // خطوة فك الرابط القصير vt.tiktok للحصول على الرابط الطويل
-    const follow = await fetch(url, {
+    // 1. فك الرابط القصير يدوياً للتأكد من صحته
+    const getLongUrl = await fetch(url, {
       method: 'GET',
       redirect: 'follow',
-      headers: { 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15' }
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+      }
     });
-    const finalUrl = follow.url;
+    
+    const finalLongUrl = getLongUrl.url.split('?')[0]; // تنظيف الرابط من التتبع
 
-    // إرسال الرابط الحقيقي لـ API التنزيل
-    const tikRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(finalUrl)}&hd=1`);
-    const result = await tikRes.json();
+    // 2. استخدام API بديل وأسرع (Loovit أو Tikwm)
+    const apiRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(finalLongUrl)}&hd=1`);
+    const result = await apiRes.json();
 
     if (result.code === 0 && result.data) {
-      const d = result.data;
-      if (d.images && d.images.length > 0) {
-        return res.json({ status: 'picker', picker: d.images.map(img => ({ url: img })) });
-      }
-      return res.json({ status: 'success', url: d.hdplay || d.play });
+      // إرسال النتيجة فوراً
+      return res.json({ 
+        status: 'success', 
+        url: result.data.hdplay || result.data.play,
+        title: result.data.title 
+      });
+    } else {
+      // إذا فشل الـ API الأول، نحاول بطلب مباشر لفك الفيديو (خطة بديلة)
+      return res.status(404).json({ error: 'فشل الـ API في جلب البيانات' });
     }
-    res.status(404).json({ error: 'لم يتم العثور على محتوى' });
   } catch (e) {
-    res.status(500).json({ error: 'خطأ في معالجة الرابط' });
+    return res.status(500).json({ error: 'خطأ داخلي في السيرفر' });
   }
 };
