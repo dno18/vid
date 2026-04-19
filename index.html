@@ -134,92 +134,38 @@ input[type=text]:focus{border-color:rgba(96,165,250,0.4)}
 </div>
 
 <script>
-var API_BASE = window.location.origin;
-var Q = '1080';
-
-function showNotif(type, html) {
-  var el = document.getElementById('notif');
-  el.className = 'notif ' + type;
-  el.innerHTML = html;
-  el.style.display = 'flex';
-}
-
-async function doPaste() {
-  try {
-    var t = await navigator.clipboard.readText();
-    document.getElementById('urlIn').value = t;
-  } catch (e) { document.getElementById('urlIn').focus(); }
-}
-
-function setQ(btn, q) {
-  Q = q;
-  document.querySelectorAll('.qb').forEach(b => b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-
 async function saveToAlbum(videoUrl) {
   const btn = document.getElementById('albumBtn');
   const oldText = btn.innerHTML;
-  btn.innerHTML = "جاري التجهيز للألبوم...";
+  btn.innerHTML = '<span class="spin"></span> جاري التحضير...';
   btn.disabled = true;
 
   try {
+    // نستخدم البروكسي لطلب الفيديو كـ Blob
     const proxyUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(videoUrl);
     const resp = await fetch(proxyUrl);
+    
+    if (!resp.ok) throw new Error('فشل جلب الملف');
+    
     const blob = await resp.blob();
     const file = new File([blob], "video.mp4", { type: "video/mp4" });
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'حفظ الفيديو' });
-    } else { alert("متصفحك لا يدعم الحفظ المباشر."); }
-  } catch (err) { alert("حدث خطأ في تجهيز الملف."); }
-  
-  btn.innerHTML = oldText;
-  btn.disabled = false;
-}
-
-async function go() {
-  var url = document.getElementById('urlIn').value.trim();
-  if (!url) { showNotif('err', '⚠ الرجاء إدخال رابط'); return; }
-
-  var btn = document.getElementById('dlBtn');
-  btn.disabled = true;
-  document.getElementById('result').innerHTML = '';
-  document.getElementById('picker').style.display = 'none';
-  
-  showNotif('load', '<div class="spin"></div> جارٍ جلب البيانات...');
-
-  try {
-    var response = await fetch(API_BASE + '/api/download', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: url, videoQuality: Q })
-    });
-
-    var data = await response.json();
-
-    if (data.status === 'picker') {
-      showNotif('ok', '✓ تم العثور على مجموعة صور:');
-      var html = '';
-      data.picker.forEach(item => {
-        var pImg = API_BASE + '/api/proxy?url=' + encodeURIComponent(item.url);
-        html += `<div class="pitem"><img src="${pImg}"><a href="${pImg}" download class="pitem-lbl">حفظ الصورة</a></div>`;
+    // محاولة استخدام ميزة المشاركة الأصلية (أفضل طريقة للآيفون)
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'حفظ الفيديو',
       });
-      document.getElementById('picker').innerHTML = html;
-      document.getElementById('picker').style.display = 'grid';
-    } else if (data.url) {
-      showNotif('ok', '✓ جاهز للتنزيل');
-      var finalUrl = API_BASE + '/api/proxy?url=' + encodeURIComponent(data.url);
-      document.getElementById('result').innerHTML = `
-        <a href="${finalUrl}" download="video.mp4" class="dl-link">تنزيل الفيديو (للملفات)</a>
-        <button id="albumBtn" class="dl-link album-btn" onclick="saveToAlbum('${data.url}')">حفظ في الألبوم (iPhone)</button>
-      `;
     } else {
-      showNotif('err', '✕ فشل العثور على محتوى قابل للتحميل');
+      // إذا فشلت المشاركة، نفتح الفيديو في نافذة جديدة ليقوم المستخدم بحفظه يدوياً بضغطة مطولة
+      window.open(proxyUrl, '_blank');
+      alert("اضغط بشكل مطول على الفيديو ثم اختر 'Save to Photos'");
     }
   } catch (err) {
-    showNotif('err', '✕ خطأ في الشبكة');
+    console.error(err);
+    alert("حدث خطأ، جرب استخدام زر 'تنزيل للملفات' ثم حفظه للألبوم");
   } finally {
+    btn.innerHTML = oldText;
     btn.disabled = false;
   }
 }
