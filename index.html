@@ -2,24 +2,25 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Pro Downloader</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TikTok Pro | المحمل الذكي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #0070f3; --bg: #000; --card: #111; }
-        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .app { width: 100%; max-width: 450px; text-align: center; }
-        h1 { font-weight: 900; font-size: 32px; background: linear-gradient(to right, #0070f3, #f81ae5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; }
-        .box { background: var(--card); padding: 25px; border-radius: 25px; border: 1px solid #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #333; background: #000; color: #fff; outline: none; transition: 0.3s; margin-bottom: 15px; text-align: center; }
-        input:focus { border-color: var(--p); }
-        button { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--p); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
+        .app { width: 100%; max-width: 420px; margin-top: 30px; }
+        h1 { font-weight: 900; font-size: 35px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 25px; text-align: center; }
+        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid #333; background: #000; color: #fff; outline: none; transition: 0.3s; margin-bottom: 15px; text-align: center; font-size: 16px; }
+        input:focus { border-color: var(--p); box-shadow: 0 0 15px rgba(0, 112, 243, 0.2); }
+        button { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 700; font-size: 17px; cursor: pointer; transition: 0.3s; }
         button:active { transform: scale(0.96); }
-        #preview { display: none; margin-top: 25px; animation: slideUp 0.5s ease; }
-        video { width: 100%; border-radius: 20px; border: 1px solid #333; background: #000; }
-        .dl-btn { display: block; margin-top: 15px; padding: 15px; background: #fff; color: #000; text-decoration: none; border-radius: 15px; font-weight: 700; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { width: 20px; height: 20px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
+        #previewArea { display: none; margin-top: 25px; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        video { width: 100%; border-radius: 20px; border: 1px solid #333; background: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; text-decoration: none; border-radius: 18px; font-weight: 900; font-size: 16px; border: none; width: 100%; cursor: pointer; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -27,31 +28,34 @@
     <div class="app">
         <h1>TikTok Pro</h1>
         <div class="box">
-            <input type="text" id="url" placeholder="ضع رابط الفيديو هنا">
-            <button id="btn" onclick="download()">جلب الفيديو</button>
-            <div id="status" style="margin-top:15px; color:#888; display:none"></div>
-            <div id="preview">
-                <video id="player" controls playsinline></video>
-                <a id="save" class="dl-btn">حفظ الفيديو في الألبوم</a>
+            <input type="text" id="vUrl" placeholder="الصق رابط تيك توك هنا">
+            <button id="mainBtn" onclick="process()">جلب الفيديو</button>
+            <div id="status" style="margin-top:15px; text-align:center; color:#888; display:none; font-size:14px;"></div>
+            
+            <div id="previewArea">
+                <video id="vPlayer" controls playsinline></video>
+                <button id="saveBtn" class="btn-save" onclick="saveToAlbum()">حفظ في الألبوم 📥</button>
             </div>
         </div>
     </div>
 
     <script>
-        async function download() {
-            const url = document.getElementById('url').value;
-            const btn = document.getElementById('btn');
-            const status = document.getElementById('status');
-            const preview = document.getElementById('preview');
-            const player = document.getElementById('player');
-            const saveBtn = document.getElementById('save');
+        let currentVideoUrl = "";
 
-            if(!url) return alert("أدخل الرابط!");
+        async function process() {
+            const url = document.getElementById('vUrl').value.trim();
+            const btn = document.getElementById('mainBtn');
+            const status = document.getElementById('status');
+            const preview = document.getElementById('previewArea');
+            const player = document.getElementById('vPlayer');
+
+            if(!url) return alert("أدخل الرابط أولاً");
 
             btn.disabled = true;
             btn.innerHTML = '<span class="loader"></span>';
             status.style.display = "block";
-            status.innerHTML = "جاري التحليل وتجاوز القيود...";
+            status.innerHTML = "جاري كسر حماية الرابط...";
+            preview.style.display = "none";
 
             try {
                 const res = await fetch('/api/download', {
@@ -62,20 +66,52 @@
                 const data = await res.json();
 
                 if(data.status === 'success') {
-                    const finalUrl = `/api/proxy?url=${encodeURIComponent(data.url)}`;
-                    player.src = finalUrl;
-                    saveBtn.href = finalUrl;
+                    currentVideoUrl = data.url;
+                    // البروكسي ضروري لتجاوز "صوت فقط" وظهور الصورة
+                    const proxyPath = `/api/proxy?url=${encodeURIComponent(data.url)}`;
+                    player.src = proxyPath;
                     preview.style.display = "block";
-                    status.innerHTML = "✓ تم التجهيز بنجاح";
-                    player.play();
+                    status.innerHTML = "✓ جاهز للحفظ الآن";
                 } else {
-                    alert("فشل الجلب، جرب رابطاً آخر");
+                    alert("عذراً، المحرك مشغول حالياً. جرب رابطاً آخر.");
                 }
             } catch(e) {
-                alert("حدث خطأ في السيرفر");
+                alert("حدث خطأ في الاتصال بالسيرفر.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "جلب الفيديو";
+            }
+        }
+
+        async function saveToAlbum() {
+            const saveBtn = document.getElementById('saveBtn');
+            const originalText = saveBtn.innerText;
+            saveBtn.disabled = true;
+            saveBtn.innerText = "جاري التحضير للألبوم...";
+
+            try {
+                const proxyPath = `/api/proxy?url=${encodeURIComponent(currentVideoUrl)}`;
+                const response = await fetch(proxyPath);
+                const blob = await response.blob();
+                
+                // تحويل الـ Blob إلى ملف حقيقي ليفهمه نظام iOS كفيديو
+                const file = new File([blob], "tiktok_video.mp4", { type: "video/mp4" });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'TikTok Video',
+                    });
+                } else {
+                    // إذا كان المتصفح قديماً، نفتح الرابط في نافذة جديدة
+                    window.open(proxyPath, '_blank');
+                }
+            } catch (error) {
+                console.error("Share failed:", error);
+                alert("حدث خطأ، حاول الضغط مطولاً على الفيديو واختيار حفظ.");
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
             }
         }
     </script>
