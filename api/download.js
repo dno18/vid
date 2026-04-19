@@ -1,7 +1,6 @@
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-  // إعدادات الوصول (CORS)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -12,63 +11,55 @@ module.exports = async (req, res) => {
   if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
   try {
-    // 1. محاكاة متصفح آيفون حقيقي لفك الرابط المختصر vt.tiktok
-    const redirectResponse = await fetch(url, {
+    // 1. فك الرابط المختصر vt.tiktok يدوياً
+    const decodeLink = await fetch(url, {
       method: 'GET',
       redirect: 'follow',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Mobile/15E148 Safari/604.1',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15'
       }
     });
     
-    // الحصول على الرابط الطويل النهائي
-    let finalLongUrl = redirectResponse.url;
+    const longUrl = decodeLink.url.split('?')[0]; 
 
-    // 2. استخدام API تنزيل قوي جداً يدعم الفيديو والصور معاً
-    const apiResponse = await fetch('https://www.tikwm.com/api/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-      },
-      body: new URLSearchParams({
-        'url': finalLongUrl,
-        'hd': '1' // طلب جودة HD
-      })
+    // 2. استخدام محرك جلب (Tikwm) بطريقة الـ GET (أحياناً تكون أضمن من POST)
+    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(longUrl)}&hd=1`;
+    
+    const apiRes = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
     });
 
-    const result = await apiResponse.json();
+    const result = await apiRes.json();
 
     if (result.code === 0 && result.data) {
       const data = result.data;
 
-      // حالة الصور (Slideshow)
+      // إذا كان صور
       if (data.images && data.images.length > 0) {
         return res.json({
           status: 'picker',
-          picker: data.images.map(img => ({ url: img })),
-          music: data.music // جلب الموسيقى أيضاً
+          picker: data.images.map(img => ({ url: img }))
         });
       }
 
-      // حالة الفيديو (MP4)
-      const videoUrl = data.hdplay || data.play || data.wmplay;
-      if (videoUrl) {
+      // إذا كان فيديو - نرسل الرابط المباشر
+      const video = data.hdplay || data.play;
+      if (video) {
         return res.json({
           status: 'success',
-          url: videoUrl,
-          title: data.title,
-          cover: data.cover
+          url: video
         });
       }
     }
     
-    return res.status(404).json({ error: 'تعذر العثور على محتوى في هذا الرابط' });
+    // إذا فشل المحرك الأول، نرسل خطأ واضحاً لنعرف السبب
+    return res.status(404).json({ error: 'الـ API لم يجد بيانات، قد يكون الفيديو خاص أو محذوف' });
 
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: 'خطأ في الاتصال بالسيرفر، جرب مرة أخرى' });
+    return res.status(500).json({ error: 'خطأ في السيرفر: ' + e.message });
   }
 };
