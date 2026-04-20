@@ -11,26 +11,24 @@ module.exports = async (req, res) => {
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
     try {
-        // محرك TikTok و Instagram
-        const response = await axios.get(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url.trim())}`);
-        const d = response.data;
+        // محرك مخصص لإنستقرام وتيك توك معاً
+        const response = await axios.get(`https://api.vkrdown.com/server/index.php?url=${encodeURIComponent(url.trim())}`);
+        
+        let videoUrl = response.data?.data?.url || response.data?.url;
 
-        const videoUrl = d.result?.video?.url || d.result?.url || d.data?.play || d.data?.video?.url;
+        // إذا فشل المحرك الأول، نجرب المحرك البديل فوراً
+        if (!videoUrl) {
+            const secondTry = await axios.get(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`);
+            videoUrl = secondTry.data?.result?.video?.url || secondTry.data?.result?.url || secondTry.data?.data?.play;
+        }
 
         if (videoUrl) {
             return res.json({ status: 'success', url: videoUrl });
         } else {
-            return res.status(400).json({ status: 'error', message: 'لم نتمكن من جلب الفيديو' });
+            return res.status(400).json({ status: 'error', message: 'لم نتمكن من استخراج الفيديو، تأكد أن الحساب عام' });
         }
+
     } catch (e) {
-        // إذا فشل المحرك الأول، نجرب المحرك الاحتياطي مباشرة
-        try {
-            const backup = await axios.get(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-            if (backup.data.code === 0) {
-                return res.json({ status: 'success', url: backup.data.data.play });
-            }
-        } catch (err) {}
-        
-        return res.status(500).json({ status: 'error', message: 'السيرفر يواجه ضغطاً، حاول مرة أخرى' });
+        return res.status(500).json({ status: 'error', message: 'المحرك يحتاج تحديث، جرب رابطاً آخر حالياً' });
     }
 };
