@@ -1,44 +1,47 @@
 const https = require('https');
 
-// ─── طلب HTTP/HTTPS مدمج بدون مكتبات خارجية ───
+// ─── دالة طلب HTTP مدمجة (بدون مكتبات خارجية) ───
 function request(method, url, body, headers) {
     return new Promise((resolve, reject) => {
         const u = new URL(url);
-        const options = {
+        const opts = {
             hostname: u.hostname,
             path: u.pathname + u.search,
-            method: method,
+            method,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 ...headers,
                 ...(body ? { 'Content-Length': Buffer.byteLength(body) } : {})
             }
         };
-
-        const req = https.request(options, (res) => {
-            // تتبع التحويلات
-            if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-                return resolve(request(method, res.headers.location, body, headers));
+        const req = https.request(opts, (r) => {
+            if (r.statusCode >= 300 && r.statusCode < 400 && r.headers.location) {
+                return resolve(request(method, r.headers.location, body, headers));
             }
             let data = '';
-            res.on('data', c => data += c);
-            res.on('end', () => {
-                try { resolve({ ok: true, json: JSON.parse(data), raw: data }); }
-                catch { resolve({ ok: true, json: null, raw: data }); }
+            r.on('data', c => data += c);
+            r.on('end', () => {
+                try { resolve({ status: r.statusCode, json: JSON.parse(data), raw: data }); }
+                catch { resolve({ status: r.statusCode, json: null, raw: data }); }
             });
         });
-
-        req.setTimeout(7000, () => { req.destroy(); reject(new Error('timeout')); });
+        req.setTimeout(8000, () => { req.destroy(); reject(new Error('timeout')); });
         req.on('error', reject);
         if (body) req.write(body);
         req.end();
     });
 }
 
-const post = (url, body, headers) => request('POST', url, body, headers);
-const get  = (url, headers)       => request('GET',  url, null, headers || {});
+const postJSON = (url, data, hdrs) =>
+    request('POST', url, JSON.stringify(data), { 'Content-Type': 'application/json', ...hdrs });
 
-// ─── Handler الرئيسي ───
+const postForm = (url, body, hdrs) =>
+    request('POST', url, body, { 'Content-Type': 'application/x-www-form-urlencoded', ...hdrs });
+
+const getReq = (url, hdrs) =>
+    request('GET', url, null, hdrs || {});
+
+// ─────────────────────────────────────────────
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -49,26 +52,46 @@ module.exports = async (req, res) => {
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
     url = url.trim();
-    const cleanUrl = url.split('?')[0];
     const isInstagram = url.includes('instagram.com');
 
-    if (isInstagram) {
-        return await handleInstagram(cleanUrl, url, res);
-    } else {
-        return await handleTikTok(cleanUrl, url, res);
-    }
+    if (isInstagram) return await handleInstagram(url, res);
+    else              return await handleTikTok(url, res);
 };
 
 // ─────────────────────────────────────────────
-//  محرك إنستقرام
+//  إنستقرام — محركات مخصصة للسيرفرات
 // ─────────────────────────────────────────────
-async function handleInstagram(cleanUrl, originalUrl, res) {
+async function handleInstagram(url, res) {
+    const cleanUrl = url.split('?')[0];
 
-    // المحرك 1: saveig.app
+    // ══ المحرك 1: cobalt.tools ══
+    // مشروع مفتوح المصدر مصمم للاستخدام من السيرفرات
+    try {
+        const r = await postJSON('https://api.cobalt.tools/', { url: cleanUrl }, {
+            'Accept': 'application/json'
+        });
+
+        if (r.json?.status === 'tunnel' || r.json?.status === 'redirect') {
+            return res.json({ status: 'success', url: r.json.url });
+        }
+
+        // نوع picker (مثلاً منشور فيه أكثر من فيديو)
+        if (r.json?.status === 'picker' && r.json?.picker?.[0]?.url) {
+            return res.json({ status: 'success', url: r.json.picker[0].url });
+        }
+    } catch (e) { console.log('[IG cobalt]', e.message); }
+
+    // ══ المحرك 2: tiklydown (يدعم إنستقرام ريلز) ══
+    try {
+        const r = await getReq(`https://api.tiklydown.eu.org/api/download/v2?url=${encodeURIComponent(cleanUrl)}`);
+        const videoUrl = r.json?.result?.video?.url || r.json?.video?.url || r.json?.url;
+        if (videoUrl) return res.json({ status: 'success', url: videoUrl });
+    } catch (e) { console.log('[IG tiklydown]', e.message); }
+
+    // ══ المحرك 3: saveig.app ══
     try {
         const body = `q=${encodeURIComponent(cleanUrl)}&t=media&lang=ar`;
-        const r = await post('https://v3.saveig.app/api/ajaxSearch', body, {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        const r = await postForm('https://v3.saveig.app/api/ajaxSearch', body, {
             'X-Requested-With': 'XMLHttpRequest',
             'Origin':  'https://saveig.app',
             'Referer': 'https://saveig.app/'
@@ -76,60 +99,42 @@ async function handleInstagram(cleanUrl, originalUrl, res) {
         const html = r.json?.data || r.raw || '';
         const m = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
         if (m) return res.json({ status: 'success', url: decodeURIComponent(m[1]) });
-    } catch (e) { console.log('[IG1]', e.message); }
-
-    // المحرك 2: igdownloader.app
-    try {
-        const body = `recaptchaToken=&q=${encodeURIComponent(cleanUrl)}&t=media&lang=ar`;
-        const r = await post('https://igdownloader.app/api/ajaxSearch', body, {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Origin':  'https://igdownloader.app',
-            'Referer': 'https://igdownloader.app/'
-        });
-        const html = r.json?.data || r.raw || '';
-        const m = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
-        if (m) return res.json({ status: 'success', url: decodeURIComponent(m[1]) });
-    } catch (e) { console.log('[IG2]', e.message); }
-
-    // المحرك 3: snapinsta.app
-    try {
-        const body = `url=${encodeURIComponent(cleanUrl)}`;
-        const r = await post('https://snapinsta.app/action.php', body, {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Referer': 'https://snapinsta.app/'
-        });
-        const videoUrl = r.json?.url || r.json?.media?.[0]?.url;
-        if (videoUrl) return res.json({ status: 'success', url: videoUrl });
-        const m = r.raw.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
-        if (m) return res.json({ status: 'success', url: decodeURIComponent(m[1]) });
-    } catch (e) { console.log('[IG3]', e.message); }
+    } catch (e) { console.log('[IG saveig]', e.message); }
 
     return res.status(400).json({
         status: 'error',
-        message: 'لم نتمكن من استخراج الفيديو. تأكد أن الحساب عام والرابط صحيح.'
+        message: 'تأكد أن الحساب غير مخفي وأن الرابط من Reel أو منشور عام.'
     });
 }
 
 // ─────────────────────────────────────────────
-//  محرك تيك توك
+//  تيك توك — يعمل بشكل ممتاز
 // ─────────────────────────────────────────────
-async function handleTikTok(cleanUrl, originalUrl, res) {
+async function handleTikTok(url, res) {
+    const cleanUrl = url.split('?')[0];
 
-    // المحرك 1: tiklydown
+    // المحرك 1: cobalt.tools (يدعم تيك توك أيضاً)
     try {
-        const r = await get(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`);
+        const r = await postJSON('https://api.cobalt.tools/', { url }, {
+            'Accept': 'application/json'
+        });
+        if (r.json?.status === 'tunnel' || r.json?.status === 'redirect') {
+            return res.json({ status: 'success', url: r.json.url });
+        }
+    } catch (e) { console.log('[TK cobalt]', e.message); }
+
+    // المحرك 2: tiklydown
+    try {
+        const r = await getReq(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`);
         const videoUrl = r.json?.result?.video?.url || r.json?.result?.url || r.json?.data?.play;
         if (videoUrl) return res.json({ status: 'success', url: videoUrl });
-    } catch (e) { console.log('[TK1]', e.message); }
+    } catch (e) { console.log('[TK tiklydown]', e.message); }
 
-    // المحرك 2: tikwm
+    // المحرك 3: tikwm
     try {
-        const r = await get(`https://www.tikwm.com/api/?url=${encodeURIComponent(originalUrl)}`);
-        if (r.json?.data?.play) {
-            return res.json({ status: 'success', url: r.json.data.play });
-        }
-    } catch (e) { console.log('[TK2]', e.message); }
+        const r = await getReq(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+        if (r.json?.data?.play) return res.json({ status: 'success', url: r.json.data.play });
+    } catch (e) { console.log('[TK tikwm]', e.message); }
 
     return res.status(400).json({
         status: 'error',
