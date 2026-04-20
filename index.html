@@ -25,12 +25,8 @@
         .media-box { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: #000; }
         video { width: 100%; display: block; max-height: 450px; }
         .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; text-align: center; border: none; }
-        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
-        .grid-item { border-radius: 15px; overflow: hidden; border: 1px solid var(--border); aspect-ratio: 1; }
-        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
     </style>
 </head>
 <body>
@@ -49,10 +45,6 @@
                     <div class="media-box"><video id="player" controls playsinline></video></div>
                     <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
                 </div>
-                <div id="iZone" style="display:none;">
-                    <p style="text-align:center; color:#888; margin-bottom:10px;">ألبوم صور:</p>
-                    <div class="image-grid" id="iGrid"></div>
-                </div>
             </div>
         </div>
     </div>
@@ -63,13 +55,20 @@
             document.getElementById('igBtn').className = p==='instagram'?'platform-btn active':'platform-btn';
         }
         async function run() {
-            let url = document.getElementById('vUrl').value.trim();
-            url = url.replace(/^[\/\s]+/, ''); // تنظيف السلاش من البداية
+            let urlInput = document.getElementById('vUrl');
+            let url = urlInput.value.trim();
+            
+            // تنظيف الرابط من أي سلاش زائد في البداية قبل الإرسال (حل مشكلة التعليق)
+            url = url.replace(/^[\/]+/, ''); 
+            urlInput.value = url; // تحديث الخانة بالشكل النظيف
+
             if(!url.includes('http')) return alert("رابط غير صحيح");
+            
             const btn = document.getElementById('go');
             const st = document.getElementById('status');
             btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
             st.innerHTML = "جاري تتبع الرابط...";
+
             try {
                 const r = await fetch('/api/download', {
                     method: 'POST',
@@ -81,13 +80,8 @@
                     resData = d;
                     st.innerHTML = "✓ تم العثور على الفيديو";
                     document.getElementById('previewArea').style.display = 'block';
-                    if(d.type === 'video') {
-                        document.getElementById('vZone').style.display = 'block';
-                        document.getElementById('player').src = `/api/proxy?url=${encodeURIComponent(d.url)}&type=video`;
-                    } else {
-                        document.getElementById('iZone').style.display = 'block';
-                        document.getElementById('iGrid').innerHTML = d.images.map(img => `<div class="grid-item"><img src="/api/proxy?url=${encodeURIComponent(img)}&type=image"></div>`).join('');
-                    }
+                    document.getElementById('vZone').style.display = 'block';
+                    document.getElementById('player').src = `/api/proxy?url=${encodeURIComponent(d.url)}&type=video`;
                 } else { st.innerHTML = "✕ " + d.message; }
             } catch(e) { st.innerHTML = "✕ خطأ في الاتصال"; }
             finally { btn.disabled = false; btn.innerText = "جلب المحتوى"; }
@@ -96,13 +90,8 @@
             const b = document.getElementById('saveBtn');
             b.innerText = "جاري التحضير...";
             const pUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
-            const r = await fetch(pUrl);
-            const blob = await r.blob();
-            const file = new File([blob], "video.mp4", {type: "video/mp4"});
-            if (navigator.share && navigator.canShare({files: [file]})) {
-                await navigator.share({files: [file]});
-            } else { window.location.href = pUrl; }
-            b.innerText = "حفظ في الألبوم 📥";
+            window.location.href = pUrl;
+            setTimeout(() => { b.innerText = "حفظ في الألبوم 📥"; }, 2000);
         }
     </script>
 </body>
