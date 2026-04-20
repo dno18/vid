@@ -1,8 +1,6 @@
 {
-  "name": "tiktok-downloader-v6",
-  "version": "1.0.0",
-  "description": "Social Media Downloader",
-  "main": "api/download.js",
+  "name": "social-downloader",
+  "version": "1.1.0",
   "dependencies": {
     "node-fetch": "^2.6.1"
   }
