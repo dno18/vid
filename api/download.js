@@ -10,31 +10,36 @@ module.exports = async (req, res) => {
     let { url } = req.body;
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
-    // تنظيف الرابط من أي رموز زائدة ناتجة عن النسخ الخاطئ
-    url = url.trim().replace(/^[\/\s]+/, '');
+    // تنظيف الرابط
+    url = url.trim().replace(/^[\/]+/, '');
 
     try {
-        // المحرك الأساسي (يدعم الروابط القصيرة تلقائياً)
-        const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`, {
+        // الخطوة 1: محاكاة متصفح حقيقي لجلب بيانات الفيديو
+        const apiResponse = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1',
+                'Accept': 'application/json'
             }
         });
         
-        const d = await response.json();
+        const result = await apiResponse.json();
 
-        if (d.code === 0 && d.data) {
+        if (result.code === 0 && result.data) {
             res.json({
                 status: 'success',
-                platform: url.includes('tiktok') ? 'TikTok' : 'Instagram',
-                url: d.data.hdplay || d.data.play, // رابط الفيديو
-                type: d.data.images ? 'image_album' : 'video',
-                images: d.data.images || null
+                platform: 'TikTok',
+                url: result.data.hdplay || result.data.play,
+                title: result.data.title,
+                author: result.data.author.nickname,
+                type: result.data.images ? 'image_album' : 'video'
             });
         } else {
-            res.json({ status: 'error', message: 'لم يتم العثور على محتوى. تأكد أن الحساب ليس خاصاً.' });
+            res.status(400).json({ 
+                status: 'error', 
+                message: 'فشل المحرك في استخراج الفيديو. جرب نسخ الرابط الطويل من المتصفح.' 
+            });
         }
     } catch (e) {
-        res.status(500).json({ status: 'error', message: 'عذراً، المحرك لا يستجيب حالياً.' });
+        res.status(500).json({ status: 'error', message: 'خطأ في الاتصال بالمحرك الخلفي' });
     }
 };
