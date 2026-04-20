@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Pro | المحمل الذكي</title>
+    <title>Social Media Pro | v3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -14,47 +14,77 @@
             --border: #222;
         }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
-        .app { width: 100%; max-width: 420px; margin-top: 20px; }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Tajawal', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            padding: 20px; 
+            min-height: 100vh; 
+        }
+        .app { width: 100%; max-width: 420px; margin-top: 10px; }
         
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .header p { color: #666; font-size: 14px; margin-top: 5px; }
+        .header p { color: #666; font-size: 13px; margin-top: 5px; }
 
-        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .box { 
+            background: var(--card); 
+            padding: 25px; 
+            border-radius: 30px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
+        }
 
-        /* ستايل اختيار المنصة */
+        /* اختيار المنصة */
         .platform-selector { display: flex; gap: 10px; margin-bottom: 20px; }
         .platform-btn { 
-            flex: 1; padding: 12px; border-radius: 15px; border: 1px solid var(--border); 
+            flex: 1; padding: 14px; border-radius: 18px; border: 1px solid var(--border); 
             background: #1a1a1a; color: #888; cursor: pointer; transition: 0.3s; font-weight: 700;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .platform-btn.active { 
             background: var(--p); color: #fff; border-color: var(--p); 
-            box-shadow: 0 0 15px rgba(0, 112, 243, 0.3);
+            box-shadow: 0 0 20px rgba(0, 112, 243, 0.3);
         }
 
-        input { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid var(--border); background: #000; color: #fff; outline: none; transition: 0.3s; margin-bottom: 15px; text-align: center; font-size: 16px; }
+        .input-group { position: relative; margin-bottom: 15px; }
+        input { 
+            width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); 
+            background: #000; color: #fff; outline: none; transition: 0.3s; 
+            text-align: center; font-size: 15px; 
+        }
         input:focus { border-color: var(--p); }
 
-        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 700; font-size: 17px; cursor: pointer; transition: 0.3s; }
-        .main-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .main-btn { 
+            width: 100%; padding: 18px; border-radius: 18px; border: none; 
+            background: var(--grad); color: #fff; font-weight: 700; 
+            font-size: 17px; cursor: pointer; transition: 0.3s; 
+        }
+        .main-btn:active { transform: scale(0.98); }
 
-        #status { margin-top: 15px; text-align: center; color: #888; font-size: 13px; display: none; }
+        #status { margin-top: 15px; text-align: center; color: #888; font-size: 13px; min-height: 20px; }
 
-        #previewArea { display: none; margin-top: 25px; animation: slideUp 0.6s ease; }
-        video { width: 100%; border-radius: 20px; border: 1px solid var(--border); background: #000; }
+        #previewArea { display: none; margin-top: 25px; animation: slideUp 0.5s ease; }
+        .media-container { 
+            border-radius: 20px; overflow: hidden; border: 1px solid var(--border); 
+            background: #000; position: relative;
+        }
+        video { width: 100%; display: block; max-height: 500px; }
         
-        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; text-decoration: none; border-radius: 18px; font-weight: 900; font-size: 16px; width: 100%; cursor: pointer; text-align: center; }
+        .btn-save { 
+            display: block; margin-top: 15px; padding: 18px; background: #fff; 
+            color: #000; border-radius: 18px; font-weight: 900; 
+            font-size: 16px; width: 100%; cursor: pointer; text-align: center; border: none;
+        }
 
-        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
-        .grid-item { position: relative; border-radius: 15px; overflow: hidden; border: 1px solid var(--border); background: #000; aspect-ratio: 1; }
+        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        .grid-item { position: relative; border-radius: 15px; overflow: hidden; border: 1px solid var(--border); aspect-ratio: 1; }
         .grid-item img { width: 100%; height: 100%; object-fit: cover; }
-        .btn-grid-save { position: absolute; bottom: 8px; right: 8px; padding: 6px 12px; background: rgba(0,0,0,0.8); border: none; border-radius: 10px; color: #fff; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .btn-grid-save { position: absolute; bottom: 5px; right: 5px; padding: 5px 10px; background: var(--p); border: none; border-radius: 8px; color: #fff; font-size: 11px; cursor: pointer; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -62,16 +92,18 @@
     <div class="app">
         <div class="header">
             <h1>Social Media Pro</h1>
-            <p>حمل فيديوهاتك المفضلة بذكاء</p>
+            <p>تحميل الذكاء الاصطناعي - تيك توك وإنستقرام</p>
         </div>
 
         <div class="box">
             <div class="platform-selector">
-                <button class="platform-btn active" onclick="setPlatform('tiktok', this)">TikTok</button>
-                <button class="platform-btn" onclick="setPlatform('instagram', this)">Instagram</button>
+                <button id="btn-tiktok" class="platform-btn active" onclick="setPlatform('tiktok')">TikTok</button>
+                <button id="btn-insta" class="platform-btn" onclick="setPlatform('instagram')">Instagram</button>
             </div>
 
-            <input type="text" id="vUrl" placeholder="الصق الرابط هنا...">
+            <div class="input-group">
+                <input type="text" id="vUrl" placeholder="الصق الرابط هنا..." spellcheck="false">
+            </div>
             
             <button id="mainBtn" class="main-btn" onclick="process()">جلب المحتوى</button>
             
@@ -79,12 +111,14 @@
             
             <div id="previewArea">
                 <div id="videoPreview" style="display:none;">
-                    <video id="vPlayer" controls playsinline></video>
+                    <div class="media-container">
+                        <video id="vPlayer" controls playsinline></video>
+                    </div>
                     <button id="saveVideoBtn" class="btn-save" onclick="saveVideoToAlbum()">حفظ الفيديو في الألبوم 📥</button>
                 </div>
 
                 <div id="imagePreview" style="display:none;">
-                    <p style="text-align:center; color:#ccc; margin-bottom:10px;">ألبوم صور مكتمل:</p>
+                    <p style="text-align:center; color:#888; font-size:13px; margin-bottom:10px;">تم العثور على ألبوم صور:</p>
                     <div class="image-grid" id="imageGrid"></div>
                 </div>
             </div>
@@ -92,18 +126,22 @@
     </div>
 
     <script>
-        let currentPlatform = 'tiktok';
         let currentResult = {};
+        let selectedPlatform = 'tiktok';
 
-        function setPlatform(p, btn) {
-            currentPlatform = p;
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        function setPlatform(p) {
+            selectedPlatform = p;
+            document.getElementById('btn-tiktok').classList.toggle('active', p === 'tiktok');
+            document.getElementById('btn-insta').classList.toggle('active', p === 'instagram');
             document.getElementById('vUrl').placeholder = `الصق رابط ${p === 'tiktok' ? 'تيك توك' : 'إنستقرام'} هنا`;
         }
 
         async function process() {
-            const url = document.getElementById('vUrl').value.trim();
+            let url = document.getElementById('vUrl').value.trim();
+            
+            // حل مشكلة السلاش الزائد الموضحة في الصورة
+            url = url.replace(/^[\/\s]+/, ''); 
+
             const btn = document.getElementById('mainBtn');
             const status = document.getElementById('status');
             const preview = document.getElementById('previewArea');
@@ -112,12 +150,12 @@
             const player = document.getElementById('vPlayer');
             const grid = document.getElementById('imageGrid');
 
-            if(!url) return alert("أدخل الرابط أولاً");
+            if(!url || !url.includes('http')) return alert("من فضلك أدخل رابطاً صحيحاً");
 
+            // إعادة ضبط الواجهة
             btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span>';
-            status.style.display = "block";
-            status.innerHTML = `جاري الجلب من ${currentPlatform}...`;
+            btn.innerHTML = '<span class="loader"></span> جاري المعالجة...';
+            status.innerHTML = "جاري تنظيف الرابط وفحص الخوادم...";
             preview.style.display = "none";
             vPreview.style.display = "none";
             iPreview.style.display = "none";
@@ -128,19 +166,20 @@
                 const res = await fetch('/api/download', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ url, platform: currentPlatform })
+                    body: JSON.stringify({ url })
                 });
                 const data = await res.json();
 
                 if(data.status === 'success') {
                     currentResult = data;
+                    status.innerHTML = `<span style="color:#4caf50">✓ تم العثور على المحتوى من ${data.platform}</span>`;
                     preview.style.display = "block";
-                    status.innerHTML = "✓ تم العثور على المحتوى";
 
                     if (data.type === 'video') {
                         vPreview.style.display = "block";
                         const proxyPath = `/api/proxy?url=${encodeURIComponent(data.url)}&type=video`;
                         player.src = proxyPath;
+                        player.load(); // إجبار المشغل على الاستجابة
                     } else if (data.type === 'image_album') {
                         iPreview.style.display = "block";
                         data.images.forEach((imgUrl, index) => {
@@ -153,11 +192,10 @@
                         });
                     }
                 } else {
-                    alert(`خطأ: ${data.message}`);
-                    status.style.display = "none";
+                    status.innerHTML = `<span style="color:#ff4b2b">✕ ${data.message || "الرابط غير مدعوم"}</span>`;
                 }
             } catch(e) {
-                alert("السيرفر لا يستجيب، حاول مجدداً.");
+                status.innerHTML = `<span style="color:#ff4b2b">✕ حدث خطأ في الاتصال بالسيرفر</span>`;
             } finally {
                 btn.disabled = false;
                 btn.innerText = "جلب المحتوى";
@@ -167,25 +205,31 @@
         async function saveVideoToAlbum() {
             if (!currentResult.url) return;
             const saveBtn = document.getElementById('saveVideoBtn');
+            const originalText = "حفظ الفيديو في الألبوم 📥";
+            
             saveBtn.disabled = true;
-            saveBtn.innerText = "جاري التحضير...";
+            saveBtn.innerText = "جاري التحميل للألبوم...";
 
             try {
                 const proxyPath = `/api/proxy?url=${encodeURIComponent(currentResult.url)}&type=video`;
                 const response = await fetch(proxyPath);
                 const blob = await response.blob();
-                const file = new File([blob], "video.mp4", { type: "video/mp4" });
+                const file = new File([blob], "video_pro.mp4", { type: "video/mp4" });
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                if (navigator.share && navigator.canShare({ files: [file] })) {
                     await navigator.share({ files: [file] });
                 } else {
-                    window.open(proxyPath, '_blank');
+                    // فتح الرابط المباشر كحل أخير إذا فشل الـ Share
+                    const a = document.createElement('a');
+                    a.href = proxyPath;
+                    a.download = "video.mp4";
+                    a.click();
                 }
             } catch (error) {
-                alert("فشل الحفظ التلقائي، اضغط مطولاً على الفيديو.");
+                alert("حدث خطأ. يمكنك الضغط مطولاً على الفيديو واختيار 'حفظ الفيديو'.");
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerText = "حفظ الفيديو في الألبوم 📥";
+                saveBtn.innerText = originalText;
             }
         }
 
@@ -194,8 +238,8 @@
                 const proxyPath = `/api/proxy?url=${encodeURIComponent(imgUrl)}&type=image`;
                 const response = await fetch(proxyPath);
                 const blob = await response.blob();
-                const file = new File([blob], `img_${index}.jpg`, { type: "image/jpeg" });
-                if (navigator.canShare) await navigator.share({ files: [file] });
+                const file = new File([blob], `image_${index}.jpg`, { type: "image/jpeg" });
+                if (navigator.share) await navigator.share({ files: [file] });
             } catch (e) { alert("فشل الحفظ."); }
         }
     </script>
