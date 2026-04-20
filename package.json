@@ -1,5 +1,5 @@
 {
-  "name": "social-downloader",
+  "name": "downloader-app",
   "version": "1.0.0",
   "main": "api/download.js",
   "dependencies": {
