@@ -9,44 +9,50 @@ module.exports = async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
-    try {
-        if (url.includes('tiktok.com')) {
-            const tikRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`);
-            const tikData = await tikRes.json();
-            if (tikData.data) {
-                return res.json({
-                    status: 'success',
-                    platform: 'tiktok',
-                    type: tikData.data.images ? 'image_album' : 'video',
-                    url: tikData.data.hdplay || tikData.data.play,
-                    images: tikData.data.images || null
-                });
-            }
-        } 
-        
-        else if (url.includes('instagram.com')) {
-            // استخدام محرك "SnapInsta" API المباشر (وسيط خفي)
-            const instaRes = await fetch(`https://api.snapinsta.app/api/video?url=${encodeURIComponent(url)}`, {
-                headers: { 'User-Agent': 'Mozilla/5.0' }
-            });
-            
-            // في حال فشل SnapInsta، نستخدم المحرك الاحترافي البديل
-            const backupRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-            const data = await backupRes.json();
-
-            if (data.code === 0 && data.data) {
-                return res.json({
-                    status: 'success',
-                    platform: 'instagram',
-                    type: data.data.images ? 'image_album' : 'video',
-                    url: data.data.play || data.data.hdplay,
-                    images: data.data.images || null
-                });
-            }
+    // مصفوفة المحركات (نظام التبادل التلقائي)
+    const engines = [
+        // المحرك 1: Tikwm (الأقوى لتيك توك وإنستقرام)
+        async (u) => {
+            const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(u)}&hd=1`);
+            const d = await r.json();
+            if (d.code === 0 && d.data) return {
+                url: d.data.hdplay || d.data.play,
+                images: d.data.images || null,
+                type: d.data.images ? 'image_album' : 'video'
+            };
+            return null;
+        },
+        // المحرك 2: Tikmate (احتياطي سريع)
+        async (u) => {
+            const r = await fetch(`https://api.tikmate.app/api/lookup?url=${encodeURIComponent(u)}`, { method: 'POST' });
+            const d = await r.json();
+            if (d.success) return { url: d.url, type: 'video' };
+            return null;
+        },
+        // المحرك 3: محرك طوارئ (بدون واجهة)
+        async (u) => {
+            const r = await fetch(`https://api.douyin.wtf/api?url=${encodeURIComponent(u)}`);
+            const d = await r.json();
+            if (d.status === 'success') return { url: d.url, type: 'video' };
+            return null;
         }
-        
-        throw new Error('فشل الجلب');
+    ];
+
+    try {
+        let finalData = null;
+        for (let engine of engines) {
+            try {
+                finalData = await engine(url);
+                if (finalData) break; // إذا نجح محرك، توقف واخرج بالنتيجة
+            } catch (err) { continue; }
+        }
+
+        if (finalData) {
+            res.json({ status: 'success', ...finalData });
+        } else {
+            res.status(500).json({ status: 'error', message: 'جميع المحركات فشلت في جلب هذا الرابط حالياً' });
+        }
     } catch (e) {
-        res.status(500).json({ status: 'error', message: 'السيرفر مضغوط، حاول مجدداً' });
+        res.status(500).json({ status: 'error', message: 'خطأ غير متوقع' });
     }
 };
