@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,12 +11,10 @@ module.exports = async (req, res) => {
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
     try {
-        // محرك واحد قوي وشامل (يدعم تيك توك وانستقرام)
-        const api = `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url.trim())}`;
-        const response = await fetch(api);
-        const d = await response.json();
+        // محرك TikTok و Instagram
+        const response = await axios.get(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url.trim())}`);
+        const d = response.data;
 
-        // استخراج الرابط بمرونة عالية
         const videoUrl = d.result?.video?.url || d.result?.url || d.data?.play || d.data?.video?.url;
 
         if (videoUrl) {
@@ -25,6 +23,14 @@ module.exports = async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'لم نتمكن من جلب الفيديو' });
         }
     } catch (e) {
-        return res.status(500).json({ status: 'error', message: 'خطأ في السيرفر' });
+        // إذا فشل المحرك الأول، نجرب المحرك الاحتياطي مباشرة
+        try {
+            const backup = await axios.get(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+            if (backup.data.code === 0) {
+                return res.json({ status: 'success', url: backup.data.data.play });
+            }
+        } catch (err) {}
+        
+        return res.status(500).json({ status: 'error', message: 'السيرفر يواجه ضغطاً، حاول مرة أخرى' });
     }
 };
