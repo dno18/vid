@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Pro | v5.0</title>
+    <title>Social Media Pro | v6.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); --border: #222; }
@@ -40,34 +40,41 @@
             <input type="text" id="vUrl" placeholder="الصق الرابط هنا" autocomplete="off">
             <button id="go" class="main-btn" onclick="run()">جلب المحتوى</button>
             <div id="status"></div>
+            
             <div id="previewArea">
-                <div id="vZone" style="display:none;">
+                <div id="vZone">
                     <div class="media-box"><video id="player" controls playsinline></video></div>
                     <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
                 </div>
             </div>
         </div>
     </div>
+
     <script>
         let resData = {};
         function sel(p) {
             document.getElementById('tkBtn').className = p==='tiktok'?'platform-btn active':'platform-btn';
             document.getElementById('igBtn').className = p==='instagram'?'platform-btn active':'platform-btn';
         }
+
         async function run() {
             let urlInput = document.getElementById('vUrl');
             let url = urlInput.value.trim();
             
-            // تنظيف الرابط من أي سلاش زائد في البداية قبل الإرسال (حل مشكلة التعليق)
+            // 1. تنظيف الرابط فوراً (حل مشكلة التعليق والسلاش)
             url = url.replace(/^[\/]+/, ''); 
-            urlInput.value = url; // تحديث الخانة بالشكل النظيف
+            urlInput.value = url;
 
-            if(!url.includes('http')) return alert("رابط غير صحيح");
+            if(!url.includes('http')) return alert("الرجاء إدخال رابط صحيح");
             
             const btn = document.getElementById('go');
             const st = document.getElementById('status');
-            btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
-            st.innerHTML = "جاري تتبع الرابط...";
+            const pre = document.getElementById('previewArea');
+
+            btn.disabled = true; 
+            btn.innerHTML = '<span class="loader"></span> جاري الجلب...';
+            st.innerHTML = "جاري تتبع الرابط وفك الحماية...";
+            pre.style.display = 'none';
 
             try {
                 const r = await fetch('/api/download', {
@@ -76,22 +83,55 @@
                     body: JSON.stringify({ url })
                 });
                 const d = await r.json();
+
                 if(d.status === 'success') {
                     resData = d;
-                    st.innerHTML = "✓ تم العثور على الفيديو";
-                    document.getElementById('previewArea').style.display = 'block';
-                    document.getElementById('vZone').style.display = 'block';
+                    st.innerHTML = `<span style="color:#00ff88">✓ تم العثور على الفيديو</span>`;
+                    pre.style.display = 'block';
+                    // استخدام البروكسي لتشغيل الفيديو بدون حظر
                     document.getElementById('player').src = `/api/proxy?url=${encodeURIComponent(d.url)}&type=video`;
-                } else { st.innerHTML = "✕ " + d.message; }
-            } catch(e) { st.innerHTML = "✕ خطأ في الاتصال"; }
-            finally { btn.disabled = false; btn.innerText = "جلب المحتوى"; }
+                } else { 
+                    st.innerHTML = `<span style="color:#ff4444">✕ ${d.message}</span>`; 
+                }
+            } catch(e) { 
+                st.innerHTML = "✕ حدث خطأ في الاتصال بالسيرفر"; 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "جلب المحتوى"; 
+            }
         }
+
         async function downloadMe() {
             const b = document.getElementById('saveBtn');
-            b.innerText = "جاري التحضير...";
-            const pUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
-            window.location.href = pUrl;
-            setTimeout(() => { b.innerText = "حفظ في الألبوم 📥"; }, 2000);
+            const originalText = b.innerText;
+            b.innerText = "جاري تحضير الملف...";
+            b.disabled = true;
+
+            try {
+                const pUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
+                const response = await fetch(pUrl);
+                const blob = await response.blob();
+                const file = new File([blob], "video.mp4", { type: "video/mp4" });
+
+                // 2. استخدام نظام المشاركة لمنع الصفحة السوداء (يفتح قائمة الحفظ)
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'حفظ الفيديو',
+                    });
+                } else {
+                    // حل بديل للمتصفحات التي لا تدعم المشاركة
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "video.mp4";
+                    link.click();
+                }
+            } catch (error) {
+                alert("اضغط مطولاً على الفيديو واختر 'حفظ الفيديو'");
+            } finally {
+                b.innerText = originalText;
+                b.disabled = false;
+            }
         }
     </script>
 </body>
