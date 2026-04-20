@@ -6,38 +6,76 @@
     <title>Social Media Pro | المحمل الذكي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); }
+        :root { 
+            --p: #0070f3; 
+            --bg: #050505; 
+            --card: #121212; 
+            --grad: linear-gradient(135deg, #0070f3, #f81ae5); 
+            --border: #222;
+        }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
-        .app { width: 100%; max-width: 420px; margin-top: 30px; }
-        h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 25px; text-align: center; letter-spacing: -1px; }
-        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid #222; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        input { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid #333; background: #000; color: #fff; outline: none; transition: 0.3s; margin-bottom: 15px; text-align: center; font-size: 16px; }
-        input:focus { border-color: var(--p); box-shadow: 0 0 15px rgba(0, 112, 243, 0.2); }
-        button { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 700; font-size: 17px; cursor: pointer; transition: 0.3s; }
-        button:active { transform: scale(0.96); }
-        #previewArea { display: none; margin-top: 25px; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        video { width: 100%; border-radius: 20px; border: 1px solid #333; background: #000; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
-        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; text-decoration: none; border-radius: 18px; font-weight: 900; font-size: 16px; border: none; width: 100%; cursor: pointer; }
+        .app { width: 100%; max-width: 420px; margin-top: 20px; }
         
-        /* شبكة عرض الصور في حال الألبوم */
-        .image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 20px; }
-        .grid-item { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid #333; background: #000; }
-        .grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .btn-grid-save { position: absolute; bottom: 5px; right: 5px; padding: 5px; background: rgba(0,0,0,0.7); border: none; border-radius: 5px; color: #fff; font-size: 10px; cursor: pointer; }
+        .header { text-align: center; margin-bottom: 25px; }
+        .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: #666; font-size: 14px; margin-top: 5px; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .loader { width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+
+        /* ستايل اختيار المنصة */
+        .platform-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .platform-btn { 
+            flex: 1; padding: 12px; border-radius: 15px; border: 1px solid var(--border); 
+            background: #1a1a1a; color: #888; cursor: pointer; transition: 0.3s; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .platform-btn.active { 
+            background: var(--p); color: #fff; border-color: var(--p); 
+            box-shadow: 0 0 15px rgba(0, 112, 243, 0.3);
+        }
+
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 1px solid var(--border); background: #000; color: #fff; outline: none; transition: 0.3s; margin-bottom: 15px; text-align: center; font-size: 16px; }
+        input:focus { border-color: var(--p); }
+
+        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 700; font-size: 17px; cursor: pointer; transition: 0.3s; }
+        .main-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #status { margin-top: 15px; text-align: center; color: #888; font-size: 13px; display: none; }
+
+        #previewArea { display: none; margin-top: 25px; animation: slideUp 0.6s ease; }
+        video { width: 100%; border-radius: 20px; border: 1px solid var(--border); background: #000; }
+        
+        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; text-decoration: none; border-radius: 18px; font-weight: 900; font-size: 16px; width: 100%; cursor: pointer; text-align: center; }
+
+        .image-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+        .grid-item { position: relative; border-radius: 15px; overflow: hidden; border: 1px solid var(--border); background: #000; aspect-ratio: 1; }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-grid-save { position: absolute; bottom: 8px; right: 8px; padding: 6px 12px; background: rgba(0,0,0,0.8); border: none; border-radius: 10px; color: #fff; font-size: 12px; cursor: pointer; font-weight: bold; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="app">
-        <h1>Social Media Pro</h1>
+        <div class="header">
+            <h1>Social Media Pro</h1>
+            <p>حمل فيديوهاتك المفضلة بذكاء</p>
+        </div>
+
         <div class="box">
-            <input type="text" id="vUrl" placeholder="الصق رابط TikTok أو Instagram">
-            <button id="mainBtn" onclick="process()">جلب المحتوى</button>
-            <div id="status" style="margin-top:15px; text-align:center; color:#888; display:none; font-size:14px;"></div>
+            <div class="platform-selector">
+                <button class="platform-btn active" onclick="setPlatform('tiktok', this)">TikTok</button>
+                <button class="platform-btn" onclick="setPlatform('instagram', this)">Instagram</button>
+            </div>
+
+            <input type="text" id="vUrl" placeholder="الصق الرابط هنا...">
+            
+            <button id="mainBtn" class="main-btn" onclick="process()">جلب المحتوى</button>
+            
+            <div id="status"></div>
             
             <div id="previewArea">
                 <div id="videoPreview" style="display:none;">
@@ -46,7 +84,7 @@
                 </div>
 
                 <div id="imagePreview" style="display:none;">
-                    <p style="text-align:center; color:#ccc; margin-bottom:10px;">تم العثور على ألبوم صور:</p>
+                    <p style="text-align:center; color:#ccc; margin-bottom:10px;">ألبوم صور مكتمل:</p>
                     <div class="image-grid" id="imageGrid"></div>
                 </div>
             </div>
@@ -54,15 +92,23 @@
     </div>
 
     <script>
+        let currentPlatform = 'tiktok';
         let currentResult = {};
+
+        function setPlatform(p, btn) {
+            currentPlatform = p;
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('vUrl').placeholder = `الصق رابط ${p === 'tiktok' ? 'تيك توك' : 'إنستقرام'} هنا`;
+        }
 
         async function process() {
             const url = document.getElementById('vUrl').value.trim();
             const btn = document.getElementById('mainBtn');
             const status = document.getElementById('status');
             const preview = document.getElementById('previewArea');
-            const videoPreview = document.getElementById('videoPreview');
-            const imagePreview = document.getElementById('imagePreview');
+            const vPreview = document.getElementById('videoPreview');
+            const iPreview = document.getElementById('imagePreview');
             const player = document.getElementById('vPlayer');
             const grid = document.getElementById('imageGrid');
 
@@ -71,10 +117,10 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="loader"></span>';
             status.style.display = "block";
-            status.innerHTML = "جاري الاتصال بالمحركات العالمية...";
+            status.innerHTML = `جاري الجلب من ${currentPlatform}...`;
             preview.style.display = "none";
-            videoPreview.style.display = "none";
-            imagePreview.style.display = "none";
+            vPreview.style.display = "none";
+            iPreview.style.display = "none";
             grid.innerHTML = "";
             player.src = "";
 
@@ -82,22 +128,21 @@
                 const res = await fetch('/api/download', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ url, platform: currentPlatform })
                 });
                 const data = await res.json();
 
                 if(data.status === 'success') {
                     currentResult = data;
                     preview.style.display = "block";
-                    status.innerHTML = `✓ تم الجلب من ${data.platform === 'tiktok' ? 'تيك توك' : 'إنستقرام'}`;
+                    status.innerHTML = "✓ تم العثور على المحتوى";
 
                     if (data.type === 'video') {
-                        videoPreview.style.display = "block";
-                        // البروكسي ضروري لتجاوز حظر الآيفون
+                        vPreview.style.display = "block";
                         const proxyPath = `/api/proxy?url=${encodeURIComponent(data.url)}&type=video`;
                         player.src = proxyPath;
                     } else if (data.type === 'image_album') {
-                        imagePreview.style.display = "block";
+                        iPreview.style.display = "block";
                         data.images.forEach((imgUrl, index) => {
                             const imgProxy = `/api/proxy?url=${encodeURIComponent(imgUrl)}&type=image`;
                             grid.innerHTML += `
@@ -108,10 +153,11 @@
                         });
                     }
                 } else {
-                    alert(`عذراً: ${data.message}`);
+                    alert(`خطأ: ${data.message}`);
+                    status.style.display = "none";
                 }
             } catch(e) {
-                alert("حدث خطأ في الاتصال بالسيرفر.");
+                alert("السيرفر لا يستجيب، حاول مجدداً.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "جلب المحتوى";
@@ -121,26 +167,25 @@
         async function saveVideoToAlbum() {
             if (!currentResult.url) return;
             const saveBtn = document.getElementById('saveVideoBtn');
-            const originalText = saveBtn.innerText;
             saveBtn.disabled = true;
-            saveBtn.innerText = "جاري التحضير للألبوم...";
+            saveBtn.innerText = "جاري التحضير...";
 
             try {
                 const proxyPath = `/api/proxy?url=${encodeURIComponent(currentResult.url)}&type=video`;
                 const response = await fetch(proxyPath);
                 const blob = await response.blob();
-                const file = new File([blob], "social_media_video.mp4", { type: "video/mp4" });
+                const file = new File([blob], "video.mp4", { type: "video/mp4" });
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'Video' });
+                    await navigator.share({ files: [file] });
                 } else {
                     window.open(proxyPath, '_blank');
                 }
             } catch (error) {
-                alert("حدث خطأ، حاول الضغط مطولاً على الفيديو واختيار حفظ.");
+                alert("فشل الحفظ التلقائي، اضغط مطولاً على الفيديو.");
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerText = originalText;
+                saveBtn.innerText = "حفظ الفيديو في الألبوم 📥";
             }
         }
 
@@ -149,16 +194,9 @@
                 const proxyPath = `/api/proxy?url=${encodeURIComponent(imgUrl)}&type=image`;
                 const response = await fetch(proxyPath);
                 const blob = await response.blob();
-                const file = new File([blob], `social_media_image_${index}.jpg`, { type: "image/jpeg" });
-
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'Image' });
-                } else {
-                    window.open(proxyPath, '_blank');
-                }
-            } catch (error) {
-                alert("فشل حفظ الصورة.");
-            }
+                const file = new File([blob], `img_${index}.jpg`, { type: "image/jpeg" });
+                if (navigator.canShare) await navigator.share({ files: [file] });
+            } catch (e) { alert("فشل الحفظ."); }
         }
     </script>
 </body>
