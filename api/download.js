@@ -1,7 +1,6 @@
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-    // إعدادات السماح بالوصول (CORS)
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,11 +10,11 @@ module.exports = async (req, res) => {
     let { url } = req.body;
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
-    // تنظيف الرابط من السلاش الزائد الذي يسبب التعليق
+    // تنظيف الرابط من أي سلاش زائد ناتج عن النسخ
     url = url.trim().replace(/^[\/]+/, ''); 
 
     try {
-        // استخدام محرك يحاكي متصفح آيفون لتجاوز حماية تيك توك
+        // الاتصال بمحرك خارجي مع تمويه الطلب كأنه من آيفون حديث
         const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1'
@@ -31,7 +30,7 @@ module.exports = async (req, res) => {
                 type: d.data.images ? 'image_album' : 'video'
             });
         } else {
-            res.status(400).json({ status: 'error', message: 'تيك توك رفض الطلب، جرب مرة أخرى' });
+            res.status(400).json({ status: 'error', message: 'تيك توك حظر الطلب، حاول مرة أخرى' });
         }
     } catch (e) {
         res.status(500).json({ status: 'error', message: 'خطأ في الاتصال بالمحرك' });
