@@ -10,25 +10,31 @@ module.exports = async (req, res) => {
     let { url } = req.body;
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
-    // تنظيف الرابط في السيرفر أيضاً لزيادة الأمان
-    url = url.replace(/^\/+/, '');
+    // تنظيف الرابط من أي رموز زائدة ناتجة عن النسخ الخاطئ
+    url = url.trim().replace(/^[\/\s]+/, '');
 
     try {
-        const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`);
+        // المحرك الأساسي (يدعم الروابط القصيرة تلقائياً)
+        const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        });
+        
         const d = await response.json();
 
         if (d.code === 0 && d.data) {
             res.json({
                 status: 'success',
-                platform: url.includes('tiktok') ? 'tiktok' : 'instagram',
-                url: d.data.hdplay || d.data.play,
+                platform: url.includes('tiktok') ? 'TikTok' : 'Instagram',
+                url: d.data.hdplay || d.data.play, // رابط الفيديو
                 type: d.data.images ? 'image_album' : 'video',
                 images: d.data.images || null
             });
         } else {
-            res.json({ status: 'error', message: 'الرابط غير صحيح أو الفيديو خاص' });
+            res.json({ status: 'error', message: 'لم يتم العثور على محتوى. تأكد أن الحساب ليس خاصاً.' });
         }
     } catch (e) {
-        res.status(500).json({ status: 'error', message: 'السيرفر مضغوط حالياً' });
+        res.status(500).json({ status: 'error', message: 'عذراً، المحرك لا يستجيب حالياً.' });
     }
 };
