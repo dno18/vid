@@ -1,7 +1,6 @@
 {
-  "name": "tiktok-downloader-pro",
+  "name": "vid-downloader",
   "version": "1.0.0",
-  "main": "api/download.js",
   "dependencies": {
     "node-fetch": "^2.6.1"
   }
