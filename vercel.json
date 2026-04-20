@@ -1,7 +1,5 @@
 {
-  "version": 2,
-  "rewrites": [
-    { "source": "/api/download", "destination": "/api/download.js" },
-    { "source": "/api/proxy", "destination": "/api/proxy.js" }
-  ]
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
 }
