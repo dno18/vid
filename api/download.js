@@ -12,10 +12,8 @@ module.exports = async (req, res) => {
     let { url } = req.body;
     if (!url) return res.status(400).json({ error: 'الرابط مطلوب' });
 
-    // تنظيف الرابط
     url = url.trim();
     const cleanUrl = url.split('?')[0];
-
     const isInstagram = url.includes('instagram.com');
 
     if (isInstagram) {
@@ -26,52 +24,49 @@ module.exports = async (req, res) => {
 };
 
 // ─────────────────────────────────────────────
-//  محرك إنستقرام المخصص (3 محركات احتياطية)
+//  محرك إنستقرام (timeout آمن أقل من 10 ثواني)
 // ─────────────────────────────────────────────
 async function handleInstagram(cleanUrl, originalUrl, res) {
 
-    // المحرك 1: saveig.app (الأقوى لإنستقرام)
+    // المحرك 1: saveig.app
     try {
-        const formData = `q=${encodeURIComponent(cleanUrl)}&t=media&lang=ar`;
-        const r = await axios.post('https://v3.saveig.app/api/ajaxSearch', formData, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'X-Requested-With': 'XMLHttpRequest',
-                'User-Agent': UA,
-                'Origin': 'https://saveig.app',
-                'Referer': 'https://saveig.app/'
-            },
-            timeout: 12000
-        });
-
+        const r = await axios.post('https://v3.saveig.app/api/ajaxSearch',
+            `q=${encodeURIComponent(cleanUrl)}&t=media&lang=ar`,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'User-Agent': UA,
+                    'Origin': 'https://saveig.app',
+                    'Referer': 'https://saveig.app/'
+                },
+                timeout: 7000
+            }
+        );
         const html = r.data?.data || '';
-        // استخراج رابط الفيديو من HTML المُرجَع
-        const videoMatch = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
-        if (videoMatch && videoMatch[1]) {
-            return res.json({ status: 'success', url: decodeURIComponent(videoMatch[1]) });
-        }
-    } catch (e) { console.log('[IG] Method 1 failed:', e.message); }
+        const m = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
+        if (m?.[1]) return res.json({ status: 'success', url: decodeURIComponent(m[1]) });
+    } catch (e) { console.log('[IG1]', e.message); }
 
     // المحرك 2: igdownloader.app
     try {
-        const formData = `recaptchaToken=&q=${encodeURIComponent(cleanUrl)}&t=media&lang=ar`;
-        const r = await axios.post('https://igdownloader.app/api/ajaxSearch', formData, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'X-Requested-With': 'XMLHttpRequest',
-                'User-Agent': UA,
-                'Origin': 'https://igdownloader.app',
-                'Referer': 'https://igdownloader.app/'
-            },
-            timeout: 12000
-        });
-
+        const r = await axios.post('https://igdownloader.app/api/ajaxSearch',
+            `recaptchaToken=&q=${encodeURIComponent(cleanUrl)}&t=media&lang=ar`,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'User-Agent': UA,
+                    'Origin': 'https://igdownloader.app',
+                    'Referer': 'https://igdownloader.app/'
+                },
+                timeout: 7000
+            }
+        );
         const html = r.data?.data || '';
-        const videoMatch = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
-        if (videoMatch && videoMatch[1]) {
-            return res.json({ status: 'success', url: decodeURIComponent(videoMatch[1]) });
-        }
-    } catch (e) { console.log('[IG] Method 2 failed:', e.message); }
+        const m = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
+        if (m?.[1]) return res.json({ status: 'success', url: decodeURIComponent(m[1]) });
+    } catch (e) { console.log('[IG2]', e.message); }
 
     // المحرك 3: snapinsta.app
     try {
@@ -83,67 +78,48 @@ async function handleInstagram(cleanUrl, originalUrl, res) {
                     'User-Agent': UA,
                     'Referer': 'https://snapinsta.app/'
                 },
-                timeout: 12000
+                timeout: 7000
             }
         );
-        // snapinsta يرجع JSON أو URL مباشر
         const videoUrl = r.data?.url || r.data?.media?.[0]?.url;
         if (videoUrl) return res.json({ status: 'success', url: videoUrl });
 
-        // أو يرجع HTML
         const html = typeof r.data === 'string' ? r.data : '';
-        const videoMatch = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
-        if (videoMatch && videoMatch[1]) {
-            return res.json({ status: 'success', url: decodeURIComponent(videoMatch[1]) });
-        }
-    } catch (e) { console.log('[IG] Method 3 failed:', e.message); }
+        const m = html.match(/href="(https:\/\/[^"]*\.mp4[^"]*)"/i);
+        if (m?.[1]) return res.json({ status: 'success', url: decodeURIComponent(m[1]) });
+    } catch (e) { console.log('[IG3]', e.message); }
 
     return res.status(400).json({
         status: 'error',
-        message: 'لم نتمكن من استخراج الفيديو. تأكد أن الحساب عام والرابط مضبوط.'
+        message: 'لم نتمكن من استخراج الفيديو. تأكد أن الحساب عام والرابط صحيح.'
     });
 }
 
 // ─────────────────────────────────────────────
-//  محرك تيك توك (يعمل بشكل صحيح)
+//  محرك تيك توك
 // ─────────────────────────────────────────────
 async function handleTikTok(cleanUrl, originalUrl, res) {
 
     // المحرك 1: tiklydown
     try {
-        const r = await axios.get(`https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`, {
-            timeout: 10000
-        });
+        const r = await axios.get(
+            `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`,
+            { timeout: 7000 }
+        );
         const videoUrl = r.data?.result?.video?.url || r.data?.result?.url || r.data?.data?.play;
         if (videoUrl) return res.json({ status: 'success', url: videoUrl });
-    } catch (e) { console.log('[TK] Method 1 failed:', e.message); }
+    } catch (e) { console.log('[TK1]', e.message); }
 
-    // المحرك 2: tikwm (الأقوى لتيك توك)
+    // المحرك 2: tikwm
     try {
-        const r = await axios.get(`https://www.tikwm.com/api/?url=${encodeURIComponent(originalUrl)}`, {
-            timeout: 10000
-        });
+        const r = await axios.get(
+            `https://www.tikwm.com/api/?url=${encodeURIComponent(originalUrl)}`,
+            { timeout: 7000 }
+        );
         if (r.data?.data?.play) {
             return res.json({ status: 'success', url: r.data.data.play });
         }
-    } catch (e) { console.log('[TK] Method 2 failed:', e.message); }
-
-    // المحرك 3: musicaldown
-    try {
-        const r = await axios.post('https://musicaldown.com/api/download',
-            `id=${encodeURIComponent(originalUrl)}`,
-            {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'User-Agent': UA,
-                    'Referer': 'https://musicaldown.com/'
-                },
-                timeout: 10000
-            }
-        );
-        const videoUrl = r.data?.links?.[0]?.a || r.data?.url;
-        if (videoUrl) return res.json({ status: 'success', url: videoUrl });
-    } catch (e) { console.log('[TK] Method 3 failed:', e.message); }
+    } catch (e) { console.log('[TK2]', e.message); }
 
     return res.status(400).json({
         status: 'error',
