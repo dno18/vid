@@ -1,21 +1,22 @@
 const https = require('https');
 
-// مفتاح RapidAPI الخاص بك
 const RAPIDAPI_KEY = '29914fedc3msh998a5bf5c930e94p16829ejsn4803a5267471';
 
-// ─── دالة HTTP مدمجة بدون مكتبات خارجية ───
+// ─── دالة HTTP مدمجة ───
 function request(method, url, body, headers) {
     return new Promise((resolve, reject) => {
         try {
             const u = new URL(url);
+            const bodyStr = body ? JSON.stringify(body) : null;
             const opts = {
                 hostname: u.hostname,
                 path: u.pathname + u.search,
                 method,
                 headers: {
                     'User-Agent': 'Mozilla/5.0',
+                    'Content-Type': 'application/json',
                     ...headers,
-                    ...(body ? { 'Content-Length': Buffer.byteLength(body) } : {})
+                    ...(bodyStr ? { 'Content-Length': Buffer.byteLength(bodyStr) } : {})
                 }
             };
             const req = https.request(opts, (r) => {
@@ -28,9 +29,9 @@ function request(method, url, body, headers) {
                     catch { resolve({ status: r.statusCode, json: null, raw: data }); }
                 });
             });
-            req.setTimeout(8000, () => { req.destroy(); reject(new Error('timeout')); });
+            req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
             req.on('error', reject);
-            if (body) req.write(body);
+            if (bodyStr) req.write(bodyStr);
             req.end();
         } catch (e) { reject(e); }
     });
@@ -76,26 +77,34 @@ module.exports = async (req, res) => {
 // ─────────────────────────────────────────────
 async function handleInstagram(url, res) {
 
-    // المحرك 1: Social Download All In One (RapidAPI)
+    // المحرك 1: Social Download All In One — POST (الطريقة الصحيحة)
     try {
-        const r = await request('GET',
-            `https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink?url=${encodeURIComponent(url)}`,
-            null,
+        const r = await request(
+            'POST',
+            'https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink',
+            { url },   // ← body
             {
                 'x-rapidapi-key':  RAPIDAPI_KEY,
                 'x-rapidapi-host': 'social-download-all-in-one.p.rapidapi.com'
             }
         );
-        // الـ API يرجع مصفوفة medias فيها الروابط
+
+        console.log('[IG1] status:', r.status, '| raw:', r.raw?.slice(0, 300));
+
         const medias = r.json?.medias || r.json?.data?.medias || [];
-        const videoItem = medias.find(m => m.type === 'video' || m.url?.includes('.mp4'));
+        // نفضّل الفيديو بجودة عالية
+        const videoItem =
+            medias.find(m => m.quality === 'hd') ||
+            medias.find(m => m.type === 'video' || m.url?.includes('.mp4')) ||
+            medias[0];
+
         if (videoItem?.url) return res.json({ status: 'success', url: videoItem.url });
-        if (medias[0]?.url) return res.json({ status: 'success', url: medias[0].url });
     } catch (e) { console.log('[IG1]', e.message); }
 
-    // المحرك 2: tiklydown (يدعم ريلز)
+    // المحرك 2: tiklydown (دعم ريلز)
     try {
-        const r = await request('GET',
+        const r = await request(
+            'GET',
             `https://api.tiklydown.eu.org/api/download/v2?url=${encodeURIComponent(url.split('?')[0])}`,
             null, {}
         );
@@ -115,25 +124,33 @@ async function handleInstagram(url, res) {
 async function handleTikTok(url, res) {
     const cleanUrl = url.split('?')[0];
 
-    // المحرك 1: Social Download All In One (RapidAPI) - يدعم تيك توك أيضاً
+    // المحرك 1: Social Download All In One — POST
     try {
-        const r = await request('GET',
-            `https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink?url=${encodeURIComponent(url)}`,
-            null,
+        const r = await request(
+            'POST',
+            'https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink',
+            { url },
             {
                 'x-rapidapi-key':  RAPIDAPI_KEY,
                 'x-rapidapi-host': 'social-download-all-in-one.p.rapidapi.com'
             }
         );
+
+        console.log('[TK1] status:', r.status, '| raw:', r.raw?.slice(0, 300));
+
         const medias = r.json?.medias || r.json?.data?.medias || [];
-        const videoItem = medias.find(m => m.type === 'video' || m.url?.includes('.mp4'));
+        const videoItem =
+            medias.find(m => m.quality === 'hd') ||
+            medias.find(m => m.type === 'video' || m.url?.includes('.mp4')) ||
+            medias[0];
+
         if (videoItem?.url) return res.json({ status: 'success', url: videoItem.url });
-        if (medias[0]?.url) return res.json({ status: 'success', url: medias[0].url });
     } catch (e) { console.log('[TK1]', e.message); }
 
     // المحرك 2: tiklydown
     try {
-        const r = await request('GET',
+        const r = await request(
+            'GET',
             `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`,
             null, {}
         );
@@ -143,7 +160,8 @@ async function handleTikTok(url, res) {
 
     // المحرك 3: tikwm
     try {
-        const r = await request('GET',
+        const r = await request(
+            'GET',
             `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`,
             null, {}
         );
