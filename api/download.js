@@ -29,7 +29,7 @@ function request(method, url, body, headers) {
                     catch { resolve({ status: r.statusCode, json: null, raw: data }); }
                 });
             });
-            req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
+            req.setTimeout(12000, () => { req.destroy(); reject(new Error('timeout')); });
             req.on('error', reject);
             if (bodyStr) req.write(bodyStr);
             req.end();
@@ -76,45 +76,82 @@ module.exports = async (req, res) => {
 //  إنستقرام
 // ─────────────────────────────────────────────
 async function handleInstagram(url, res) {
+    // نحذف الـ query string لأنه أحياناً يسبب مشكلة في الـ API
+    const cleanUrl = url.split('?')[0];
 
-    // المحرك 1: Social Download All In One — POST (الطريقة الصحيحة)
+    // ── المحرك 1: Social Download All In One ──
     try {
-        const r = await request(
-            'POST',
+        const r = await request('POST',
             'https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink',
-            { url },   // ← body
+            { url: cleanUrl },
             {
                 'x-rapidapi-key':  RAPIDAPI_KEY,
                 'x-rapidapi-host': 'social-download-all-in-one.p.rapidapi.com'
             }
         );
-
-        console.log('[IG1] status:', r.status, '| raw:', r.raw?.slice(0, 300));
-
+        console.log('[IG1] status:', r.status, '| raw:', r.raw?.slice(0, 400));
         const medias = r.json?.medias || r.json?.data?.medias || [];
-        // نفضّل الفيديو بجودة عالية
         const videoItem =
             medias.find(m => m.quality === 'hd') ||
             medias.find(m => m.type === 'video' || m.url?.includes('.mp4')) ||
             medias[0];
-
         if (videoItem?.url) return res.json({ status: 'success', url: videoItem.url });
     } catch (e) { console.log('[IG1]', e.message); }
 
-    // المحرك 2: tiklydown (دعم ريلز)
+    // ── المحرك 2: Instagram Reels & Posts Downloader (RapidAPI) ──
     try {
-        const r = await request(
-            'GET',
-            `https://api.tiklydown.eu.org/api/download/v2?url=${encodeURIComponent(url.split('?')[0])}`,
+        const r = await request('GET',
+            `https://instagram-reels-posts-downloader.p.rapidapi.com/ig/post?url=${encodeURIComponent(cleanUrl)}`,
+            null,
+            {
+                'x-rapidapi-key':  RAPIDAPI_KEY,
+                'x-rapidapi-host': 'instagram-reels-posts-downloader.p.rapidapi.com'
+            }
+        );
+        console.log('[IG2] status:', r.status, '| raw:', r.raw?.slice(0, 400));
+        // هذا الـ API يرجع مصفوفة مباشرة أو كائن فيه video_url
+        const data = r.json;
+        if (Array.isArray(data)) {
+            const vid = data.find(i => i.media_type === 2 || i.video_url);
+            if (vid?.video_url) return res.json({ status: 'success', url: vid.video_url });
+        }
+        if (data?.video_url) return res.json({ status: 'success', url: data.video_url });
+        if (data?.url)       return res.json({ status: 'success', url: data.url });
+    } catch (e) { console.log('[IG2]', e.message); }
+
+    // ── المحرك 3: Downloader for Instagram (RapidAPI) ──
+    try {
+        const r = await request('GET',
+            `https://downloader-for-instagram.p.rapidapi.com/v2/post?url=${encodeURIComponent(cleanUrl)}`,
+            null,
+            {
+                'x-rapidapi-key':  RAPIDAPI_KEY,
+                'x-rapidapi-host': 'downloader-for-instagram.p.rapidapi.com'
+            }
+        );
+        console.log('[IG3] status:', r.status, '| raw:', r.raw?.slice(0, 400));
+        const videoUrl =
+            r.json?.download_url ||
+            r.json?.video_url    ||
+            r.json?.data?.download_url ||
+            r.json?.result?.video_url;
+        if (videoUrl) return res.json({ status: 'success', url: videoUrl });
+    } catch (e) { console.log('[IG3]', e.message); }
+
+    // ── المحرك 4: tiklydown ──
+    try {
+        const r = await request('GET',
+            `https://api.tiklydown.eu.org/api/download/v2?url=${encodeURIComponent(cleanUrl)}`,
             null, {}
         );
+        console.log('[IG4] status:', r.status, '| raw:', r.raw?.slice(0, 400));
         const videoUrl = r.json?.result?.video?.url || r.json?.video?.url || r.json?.url;
         if (videoUrl) return res.json({ status: 'success', url: videoUrl });
-    } catch (e) { console.log('[IG2]', e.message); }
+    } catch (e) { console.log('[IG4]', e.message); }
 
     return res.status(400).json({
         status: 'error',
-        message: 'تأكد أن الحساب عام وأن الرابط من Reel أو منشور مفتوح.'
+        message: 'تأكد أن الحساب عام وأن الرابط صحيح.'
     });
 }
 
@@ -126,8 +163,7 @@ async function handleTikTok(url, res) {
 
     // المحرك 1: Social Download All In One — POST
     try {
-        const r = await request(
-            'POST',
+        const r = await request('POST',
             'https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink',
             { url },
             {
@@ -135,22 +171,18 @@ async function handleTikTok(url, res) {
                 'x-rapidapi-host': 'social-download-all-in-one.p.rapidapi.com'
             }
         );
-
-        console.log('[TK1] status:', r.status, '| raw:', r.raw?.slice(0, 300));
-
+        console.log('[TK1] status:', r.status, '| raw:', r.raw?.slice(0, 400));
         const medias = r.json?.medias || r.json?.data?.medias || [];
         const videoItem =
             medias.find(m => m.quality === 'hd') ||
             medias.find(m => m.type === 'video' || m.url?.includes('.mp4')) ||
             medias[0];
-
         if (videoItem?.url) return res.json({ status: 'success', url: videoItem.url });
     } catch (e) { console.log('[TK1]', e.message); }
 
     // المحرك 2: tiklydown
     try {
-        const r = await request(
-            'GET',
+        const r = await request('GET',
             `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(cleanUrl)}`,
             null, {}
         );
@@ -160,8 +192,7 @@ async function handleTikTok(url, res) {
 
     // المحرك 3: tikwm
     try {
-        const r = await request(
-            'GET',
+        const r = await request('GET',
             `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`,
             null, {}
         );
