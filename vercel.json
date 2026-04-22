@@ -1,14 +1,12 @@
 {
   "version": 2,
   "functions": {
-    "api/download.js": { "maxDuration": 10 },
-    "api/proxy.js":    { "maxDuration": 10 },
-    "api/enhance.js":  { "maxDuration": 10 }
+    "api/*.js": { "maxDuration": 10 }
   },
   "rewrites": [
     { "source": "/api/download", "destination": "/api/download.js" },
-    { "source": "/api/proxy",    "destination": "/api/proxy.js"    },
-    { "source": "/api/enhance",  "destination": "/api/enhance.js"  },
-    { "source": "/(.*)",         "destination": "/index.html"      }
+    { "source": "/api/proxy", "destination": "/api/proxy.js" },
+    { "source": "/api/enhance", "destination": "/api/enhance.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
