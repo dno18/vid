@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
     const { url } = req.body;
 
-    // التأكد من وجود الرابط
+    //التأكد من وجود الرابط
     if (!url) {
         return res.status(400).json({ status: 'error', message: 'الرابط مطلوب' });
     }
