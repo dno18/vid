@@ -13,40 +13,96 @@
         .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); margin-top: 20px; }
         .header h1 { text-align: center; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .platform-selector { display: flex; gap: 8px; margin-bottom: 20px; }
-        .platform-btn { flex: 1; padding: 12px; border-radius: 15px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; font-size: 11px; }
+        .platform-btn { flex: 1; padding: 12px; border-radius: 15px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; font-size: 11px; font-family: 'Tajawal', sans-serif; transition: all 0.2s; }
         .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
-        .upload-label { display: block; padding: 30px; border: 2px dashed #333; border-radius: 20px; text-align: center; color: #888; cursor: pointer; }
-        .main-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--grad); color: #fff; font-weight: 900; cursor: pointer; margin-top: 15px; }
+        .upload-label { display: block; padding: 30px; border: 2px dashed #333; border-radius: 20px; text-align: center; color: #888; cursor: pointer; transition: border-color 0.2s; }
+        .upload-label:hover { border-color: var(--p); }
+        .main-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--grad); color: #fff; font-weight: 900; cursor: pointer; margin-top: 15px; font-family: 'Tajawal', sans-serif; font-size: 16px; transition: opacity 0.2s; }
+        .main-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         #previewArea { display: none; margin-top: 25px; text-align: center; }
         .media-container { border-radius: 20px; overflow: hidden; border: 1px solid #333; background: #000; margin-bottom: 15px; }
         img, video { width: 100%; display: block; }
-        .btn-save { display: block; padding: 18px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-decoration: none; }
-        .loader { display: none; color: #0070f3; text-align: center; margin: 15px 0; font-weight: bold; }
+        .btn-save { display: block; padding: 18px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-decoration: none; font-family: 'Tajawal', sans-serif; cursor: pointer; border: none; width: 100%; font-size: 15px; }
+        .loader { display: none; color: #0070f3; text-align: center; margin: 15px 0; font-weight: bold; font-size: 15px; }
+        .loader span { display: inline-block; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        /* AI Result Box */
+        #aiResultBox {
+            display: none;
+            margin-top: 20px;
+            background: #0a0a1a;
+            border: 1px solid #1a1a4a;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .ai-result-header {
+            background: linear-gradient(135deg, #0070f3, #f81ae5);
+            padding: 12px 18px;
+            font-weight: 900;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-result-body {
+            padding: 18px;
+            line-height: 1.9;
+            font-size: 14px;
+            color: #ddd;
+            white-space: pre-wrap;
+        }
+        .img-preview-small {
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #333;
+            margin-bottom: 15px;
+        }
+        .img-preview-small img { width: 100%; display: block; max-height: 280px; object-fit: cover; }
+        .badge { display: inline-block; background: rgba(0,112,243,0.2); color: #0070f3; border: 1px solid rgba(0,112,243,0.3); border-radius: 8px; padding: 3px 10px; font-size: 12px; margin-bottom: 12px; }
     </style>
 </head>
 <body>
     <div class="app">
-        <div class="header"><h1>Social Media Pro</h1></div>
+        <div class="header" style="margin-bottom:20px;">
+            <h1 style="font-size:28px; margin-bottom:4px;">Social Media Pro</h1>
+            <p style="text-align:center; color:#555; font-size:13px;">v8.7</p>
+        </div>
         <div class="box">
             <div class="platform-selector">
-                <button id="tkBtn" class="platform-btn" onclick="setMode('tiktok')">TikTok</button>
-                <button id="igBtn" class="platform-btn" onclick="setMode('instagram')">Instagram</button>
+                <button id="tkBtn" class="platform-btn" onclick="setMode('tiktok')">🎵 TikTok</button>
+                <button id="igBtn" class="platform-btn" onclick="setMode('instagram')">📸 Instagram</button>
                 <button id="aiBtn" class="platform-btn" onclick="setMode('ai')">توضيح الصور ✨</button>
             </div>
 
             <div id="inputSection">
-                <input type="text" id="vUrl" style="width:100%; padding:18px; border-radius:15px; background:#000; border:1px solid #222; color:#fff; text-align:center; display:none;" placeholder="الصق الرابط هنا">
+                <input type="text" id="vUrl" style="width:100%; padding:18px; border-radius:15px; background:#000; border:1px solid #222; color:#fff; text-align:center; display:none; font-family:'Tajawal',sans-serif; font-size:14px;" placeholder="الصق الرابط هنا">
                 <div id="fileSection" style="display:none;">
                     <label class="upload-label" for="imgInp">
-                        <span id="lbl">📸 اضغط لرفع صورة</span>
+                        <div style="font-size:36px; margin-bottom:10px;">📸</div>
+                        <span id="lbl" style="font-size:14px; font-weight:700;">اضغط لرفع صورة</span>
+                        <p style="font-size:12px; color:#555; margin-top:6px;">JPG, PNG, WEBP</p>
                         <input type="file" id="imgInp" accept="image/*" style="display:none" onchange="handleImg(this)">
                     </label>
                 </div>
             </div>
 
             <button id="go" class="main-btn" onclick="process()" disabled>ابدأ المعالجة</button>
-            <div id="loading" class="loader">جاري العمل... ⏳</div>
+            <div id="loading" class="loader"><span>⏳ جاري التحليل بالذكاء الاصطناعي...</span></div>
 
+            <!-- نتيجة AI -->
+            <div id="aiResultBox">
+                <div class="ai-result-header">
+                    <span>✨</span> تحليل الصورة بالذكاء الاصطناعي
+                </div>
+                <div style="padding: 18px 18px 0;">
+                    <div class="img-preview-small"><img id="uploadedPreview" src="" alt=""></div>
+                    <div class="badge">🤖 Claude AI · تحليل دقيق</div>
+                </div>
+                <div class="ai-result-body" id="aiText"></div>
+            </div>
+
+            <!-- نتيجة فيديو -->
             <div id="previewArea">
                 <div class="media-container" id="res"></div>
                 <a id="dl" class="btn-save" download="result.jpg">حفظ النتيجة 📥</a>
@@ -56,56 +112,133 @@
 
     <script>
         let mode = '';
-        let currentImg = '';
+        let currentImgBase64 = '';
+        let currentImgMediaType = 'image/jpeg';
 
         function setMode(m) {
             mode = m;
             document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(m+'Btn').classList.add('active');
-            document.getElementById('go').disabled = false;
-            document.getElementById('vUrl').style.display = (m==='ai') ? 'none' : 'block';
-            document.getElementById('fileSection').style.display = (m==='ai') ? 'block' : 'none';
+            document.getElementById(m === 'ai' ? 'aiBtn' : m === 'tiktok' ? 'tkBtn' : 'igBtn').classList.add('active');
+            document.getElementById('go').disabled = (m === 'ai' && !currentImgBase64) ? true : false;
+            document.getElementById('vUrl').style.display = (m === 'ai') ? 'none' : 'block';
+            document.getElementById('fileSection').style.display = (m === 'ai') ? 'block' : 'none';
+            // Reset results
+            document.getElementById('aiResultBox').style.display = 'none';
+            document.getElementById('previewArea').style.display = 'none';
         }
 
         function handleImg(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
+                currentImgMediaType = file.type || 'image/jpeg';
                 const r = new FileReader();
-                r.onload = e => { currentImg = e.target.result; document.getElementById('lbl').innerText = "✅ تم اختيار الصورة"; };
-                r.readAsDataURL(input.files[0]);
+                r.onload = e => {
+                    const dataUrl = e.target.result;
+                    // Extract pure base64 (remove data:image/...;base64, prefix)
+                    currentImgBase64 = dataUrl.split(',')[1];
+                    document.getElementById('lbl').innerText = "✅ " + file.name;
+                    document.getElementById('go').disabled = false;
+                };
+                r.readAsDataURL(file);
             }
         }
 
         async function process() {
             const ld = document.getElementById('loading');
             const pre = document.getElementById('previewArea');
-            ld.style.display = 'block'; pre.style.display = 'none';
+            const aiBox = document.getElementById('aiResultBox');
+
+            ld.style.display = 'block';
+            pre.style.display = 'none';
+            aiBox.style.display = 'none';
 
             try {
-                if(mode === 'ai') {
-                    // استخدام محرك معالجة مختلف (DeepAI/Alternative)
-                    const res = await fetch('https://api.vkrdown.com/ai/upscale', {
+                if (mode === 'ai') {
+                    if (!currentImgBase64) {
+                        alert('الرجاء اختيار صورة أولاً');
+                        return;
+                    }
+
+                    // عرض الصورة المرفوعة
+                    document.getElementById('uploadedPreview').src = 'data:' + currentImgMediaType + ';base64,' + currentImgBase64;
+
+                    // استدعاء Anthropic API
+                    const response = await fetch('https://api.anthropic.com/v1/messages', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ image: currentImg })
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'anthropic-version': '2023-06-01',
+                            'anthropic-dangerous-direct-browser-access': 'true'
+                        },
+                        body: JSON.stringify({
+                            model: 'claude-sonnet-4-20250514',
+                            max_tokens: 1000,
+                            messages: [
+                                {
+                                    role: 'user',
+                                    content: [
+                                        {
+                                            type: 'image',
+                                            source: {
+                                                type: 'base64',
+                                                media_type: currentImgMediaType,
+                                                data: currentImgBase64
+                                            }
+                                        },
+                                        {
+                                            type: 'text',
+                                            text: `أنت خبير في تحليل الصور. قم بتحليل هذه الصورة بشكل شامل ودقيق باللغة العربية وأجب على هذه النقاط:
+
+1. 🖼️ **وصف عام:** ما الذي تراه في الصورة؟
+2. 🎨 **الألوان والأسلوب:** ما هي الألوان السائدة والأسلوب البصري؟
+3. 📍 **التفاصيل المهمة:** ما هي أبرز العناصر والتفاصيل في الصورة؟
+4. 💡 **جودة الصورة:** كيف تقيّم وضوح وجودة الصورة؟
+5. 📱 **ملاءمة لوسائل التواصل:** هل هذه الصورة مناسبة للنشر على وسائل التواصل الاجتماعي؟ وما هي اقتراحاتك لتحسينها؟
+
+اجعل ردك مفصلاً ومفيداً.`
+                                        }
+                                    ]
+                                }
+                            ]
+                        })
                     });
-                    const data = await res.json();
-                    if(!data.url) throw new Error();
-                    document.getElementById('res').innerHTML = `<img src="${data.url}">`;
-                    document.getElementById('dl').href = data.url;
+
+                    if (!response.ok) {
+                        const errData = await response.json();
+                        throw new Error(errData.error?.message || 'خطأ في الاتصال بـ API');
+                    }
+
+                    const data = await response.json();
+                    const resultText = data.content[0]?.text || 'لم يتم الحصول على نتيجة.';
+
+                    document.getElementById('aiText').innerText = resultText;
+                    aiBox.style.display = 'block';
+
                 } else {
+                    // TikTok / Instagram downloader (يحتاج backend)
                     const url = document.getElementById('vUrl').value;
+                    if (!url) { alert('الرجاء إدخال رابط الفيديو'); return; }
+
                     const res = await fetch('/api/download', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ url, type: mode })
                     });
-                    const data = await res.json();
-                    document.getElementById('res').innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(data.url)}&type=video" controls></video>`;
+                    const resData = await res.json();
+                    document.getElementById('res').innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(resData.url)}&type=video" controls></video>`;
+                    pre.style.display = 'block';
                 }
-                pre.style.display = 'block';
-            } catch(e) {
-                alert("عذراً، محرك الذكاء الاصطناعي تحت الصيانة حالياً. جرب فيديوهات تيك توك الآن فهي تعمل!");
-            } finally { ld.style.display = 'none'; }
+
+            } catch (e) {
+                console.error(e);
+                if (mode === 'ai') {
+                    alert('❌ خطأ: ' + e.message);
+                } else {
+                    alert('عذراً، حدث خطأ في تحميل الفيديو.');
+                }
+            } finally {
+                ld.style.display = 'none';
+            }
         }
     </script>
 </body>
