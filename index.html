@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Pro | v8.3</title>
+    <title>Social Media Pro | v8.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); --border: #222; }
@@ -24,18 +24,18 @@
         #previewArea { display: none; margin-top: 25px; }
         .media-container { border-radius: 15px; overflow: hidden; background: #000; border: 1px solid #333; }
         img, video { width: 100%; display: block; }
-        .btn-save { display: block; margin-top: 15px; padding: 15px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-align: center; text-decoration: none; }
+        .btn-save { display: block; margin-top: 15px; padding: 15px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-align: center; text-decoration: none; cursor: pointer; }
         .loader { display: none; margin: 20px 0; text-align: center; color: var(--p); font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="app">
-        <div class="header"><h1>Social Media Pro</h1><p>V8.3 - الثبات العالي</p></div>
+        <div class="header"><h1>Social Media Pro</h1><p>V8.4 - النسخة المستقرة</p></div>
         <div class="box">
             <div class="platform-selector">
-                <button id="tkBtn" class="platform-btn" onclick="setMode('tiktok')">TikTok</button>
-                <button id="igBtn" class="platform-btn" onclick="setMode('instagram')">Instagram</button>
-                <button id="aiBtn" class="platform-btn" onclick="setMode('ai')"> اممممممممم✨</button>
+                <button id="tiktokBtn" class="platform-btn" onclick="setMode('tiktok')">TikTok</button>
+                <button id="instagramBtn" class="platform-btn" onclick="setMode('instagram')">Instagram</button>
+                <button id="aiBtn" class="platform-btn" onclick="setMode('ai')">امممممممم ✨</button>
             </div>
             
             <div id="ui-input">
@@ -49,7 +49,7 @@
             </div>
 
             <button id="runBtn" class="main-btn" onclick="execute()" disabled>ابدأ الآن</button>
-            <div id="status" class="loader">جاري العمل... يرجى الانتظار ⏳</div>
+            <div id="status" class="loader">جاري المعالجة...</div>
 
             <div id="previewArea">
                 <div class="media-container" id="resBox"></div>
@@ -65,7 +65,8 @@
         function setMode(m) {
             mode = m;
             document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(m+'Btn').classList.add('active');
+            const activeBtn = document.getElementById(m === 'ai' ? 'aiBtn' : m + 'Btn');
+            if(activeBtn) activeBtn.classList.add('active');
             document.getElementById('runBtn').disabled = false;
             
             const inp = document.getElementById('vUrl');
@@ -87,7 +88,7 @@
                 const reader = new FileReader();
                 reader.onload = e => { 
                     imgData = e.target.result;
-                    document.getElementById('lblTxt').innerText = "✅ تم تجهيز الصورة";
+                    document.getElementById('lblTxt').innerText = "✅ جاهز";
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -106,15 +107,14 @@
             try {
                 if(mode === 'ai') {
                     if(!imgData) throw new Error("ارفع صورة أولاً");
-                    // استخدام محرك معالجة مباشر ومستقر
                     const r = await fetch('https://api.vkrdown.com/ai/upscale', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ image: imgData })
                     });
                     const d = await r.json();
-                    if(!d.url) throw new Error("السيرفر مشغول، حاول بصورة أصغر");
-                    resBox.innerHTML = `<img src="${d.url}">`;
+                    if(!d.url) throw new Error("السيرفر مضغوط");
+                    resBox.innerHTML = '<img src="' + d.url + '">';
                     document.getElementById('dlLink').href = d.url;
                 } else {
                     const url = document.getElementById('vUrl').value;
@@ -125,14 +125,13 @@
                     });
                     const d = await r.json();
                     if(d.status !== 'success') throw new Error(d.message);
-                    resBox.innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(d.url)}&type=video" controls></video>`;
-                    document.getElementById('dlLink').onclick = () => alert('استخدم زر المشاركة في الجوال');
+                    resBox.innerHTML = '<video src="/api/proxy?url=' + encodeURIComponent(d.url) + '&type=video" controls></video>';
                 }
                 pre.style.display = 'block';
-                st.innerText = "اكتمل العمل! ✅";
+                st.innerText = "اكتمل! ✅";
             } catch(e) {
                 alert(e.message);
-                st.innerText = "❌ حدث خطأ";
+                st.innerText = "❌ خطأ";
             } finally {
                 btn.disabled = false;
             }
