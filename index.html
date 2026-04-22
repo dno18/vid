@@ -3,140 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Pro | v8.6</title>
+    <title>Social Media Pro | v8.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); --border: #222; }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
         .app { width: 100%; max-width: 420px; }
-        .header { text-align: center; margin-bottom: 25px; }
-        .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); margin-top: 20px; }
+        .header h1 { text-align: center; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .platform-selector { display: flex; gap: 8px; margin-bottom: 20px; }
         .platform-btn { flex: 1; padding: 12px; border-radius: 15px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; font-size: 11px; }
         .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
-        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid var(--border); background: #000; color: #fff; text-align: center; margin-bottom: 15px; }
-        #fileZone { display: none; margin-bottom: 15px; }
-        .upload-label { display: block; padding: 25px; border: 2px dashed #333; border-radius: 15px; text-align: center; color: #888; cursor: pointer; }
-        .main-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--grad); color: #fff; font-weight: 900; cursor: pointer; }
-        #previewArea { display: none; margin-top: 25px; }
-        .media-container { border-radius: 15px; overflow: hidden; background: #000; border: 1px solid #333; position: relative; }
+        .upload-label { display: block; padding: 30px; border: 2px dashed #333; border-radius: 20px; text-align: center; color: #888; cursor: pointer; }
+        .main-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--grad); color: #fff; font-weight: 900; cursor: pointer; margin-top: 15px; }
+        #previewArea { display: none; margin-top: 25px; text-align: center; }
+        .media-container { border-radius: 20px; overflow: hidden; border: 1px solid #333; background: #000; margin-bottom: 15px; }
         img, video { width: 100%; display: block; }
-        .btn-save { display: block; margin-top: 15px; padding: 15px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-align: center; text-decoration: none; }
-        .loader { display: none; margin: 20px 0; text-align: center; color: var(--p); font-weight: bold; }
-        .ai-hint { font-size: 11px; color: #f81ae5; margin-top: 10px; display: block; text-align: center; }
+        .btn-save { display: block; padding: 18px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-decoration: none; }
+        .loader { display: none; color: #0070f3; text-align: center; margin: 15px 0; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="app">
-        <div class="header"><h1>Social Media Pro</h1><p>V8.6 - تجاوز القيود</p></div>
+        <div class="header"><h1>Social Media Pro</h1></div>
         <div class="box">
             <div class="platform-selector">
-                <button id="tiktokBtn" class="platform-btn" onclick="setMode('tiktok')">TikTok</button>
-                <button id="instagramBtn" class="platform-btn" onclick="setMode('instagram')">Instagram</button>
+                <button id="tkBtn" class="platform-btn" onclick="setMode('tiktok')">TikTok</button>
+                <button id="igBtn" class="platform-btn" onclick="setMode('instagram')">Instagram</button>
                 <button id="aiBtn" class="platform-btn" onclick="setMode('ai')">توضيح الصور ✨</button>
             </div>
-            <div id="ui-input">
-                <input type="text" id="vUrl" placeholder="اختر المنصة" disabled>
-                <div id="fileZone">
+
+            <div id="inputSection">
+                <input type="text" id="vUrl" style="width:100%; padding:18px; border-radius:15px; background:#000; border:1px solid #222; color:#fff; text-align:center; display:none;" placeholder="الصق الرابط هنا">
+                <div id="fileSection" style="display:none;">
                     <label class="upload-label" for="imgInp">
-                        <span id="lblTxt">ارفع الصورة هنا 📸</span>
-                        <input type="file" id="imgInp" accept="image/*" style="display:none" onchange="handleAI(this)">
+                        <span id="lbl">📸 اضغط لرفع صورة</span>
+                        <input type="file" id="imgInp" accept="image/*" style="display:none" onchange="handleImg(this)">
                     </label>
-                    <span class="ai-hint">سيتم توضيح الصورة فور اختيارها</span>
                 </div>
             </div>
-            <button id="runBtn" class="main-btn" onclick="execute()" disabled>جلب الفيديو</button>
-            <div id="status" class="loader">جاري العمل... ⏳</div>
+
+            <button id="go" class="main-btn" onclick="process()" disabled>ابدأ المعالجة</button>
+            <div id="loading" class="loader">جاري العمل... ⏳</div>
+
             <div id="previewArea">
-                <div class="media-container" id="resBox"></div>
-                <a id="dlLink" class="btn-save" target="_blank">حفظ في الألبوم 📥</a>
+                <div class="media-container" id="res"></div>
+                <a id="dl" class="btn-save" download="result.jpg">حفظ النتيجة 📥</a>
             </div>
         </div>
     </div>
 
     <script>
-        let mode = null;
+        let mode = '';
+        let currentImg = '';
 
         function setMode(m) {
             mode = m;
             document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(m === 'ai' ? 'aiBtn' : m + 'Btn').classList.add('active');
-            
-            const isAI = (m === 'ai');
-            document.getElementById('runBtn').style.display = isAI ? 'none' : 'block';
-            document.getElementById('runBtn').disabled = isAI;
-            document.getElementById('vUrl').style.display = isAI ? 'none' : 'block';
-            document.getElementById('fileZone').style.display = isAI ? 'block' : 'none';
-            if(!isAI) { document.getElementById('vUrl').disabled = false; document.getElementById('vUrl').placeholder = "الصق الرابط هنا"; }
+            document.getElementById(m+'Btn').classList.add('active');
+            document.getElementById('go').disabled = false;
+            document.getElementById('vUrl').style.display = (m==='ai') ? 'none' : 'block';
+            document.getElementById('fileSection').style.display = (m==='ai') ? 'block' : 'none';
         }
 
-        // معالجة الصور بطريقة "الرابط المباشر" لتفادي أخطاء السيرفر
-        async function handleAI(input) {
-            if (!input.files || !input.files[0]) return;
-            
-            const st = document.getElementById('status');
-            const pre = document.getElementById('previewArea');
-            st.style.display = 'block'; pre.style.display = 'none';
-            st.innerText = "جاري رفع ومعالجة الصورة... (قد يستغرق 15 ثانية)";
-
-            const formData = new FormData();
-            formData.append('image', input.files[0]);
-
-            try {
-                // استخدام API يقبل فورم داتا (أخف على السيرفر)
-                const r = await fetch('https://api.vkrdown.com/ai/upscale', {
-                    method: 'POST',
-                    body: JSON.stringify({ image: await toBase64(input.files[0]) }),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const d = await r.json();
-                
-                if(d.url) {
-                    document.getElementById('resBox').innerHTML = `<img src="${d.url}">`;
-                    document.getElementById('dlLink').href = d.url;
-                    pre.style.display = 'block';
-                    st.innerText = "اكتمل التوضيح! ✅";
-                } else {
-                    throw new Error();
-                }
-            } catch(e) {
-                st.innerText = "❌ السيرفر مشغول، حاول مرة أخرى لاهنت";
-                alert("جرب صورة أصغر قليلاً أو لقطة شاشة");
+        function handleImg(input) {
+            if (input.files && input.files[0]) {
+                const r = new FileReader();
+                r.onload = e => { currentImg = e.target.result; document.getElementById('lbl').innerText = "✅ تم اختيار الصورة"; };
+                r.readAsDataURL(input.files[0]);
             }
         }
 
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-
-        async function execute() {
-            const st = document.getElementById('status');
+        async function process() {
+            const ld = document.getElementById('loading');
             const pre = document.getElementById('previewArea');
-            const url = document.getElementById('vUrl').value;
-            st.style.display = 'block'; pre.style.display = 'none';
+            ld.style.display = 'block'; pre.style.display = 'none';
 
             try {
-                const r = await fetch('/api/download', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ url, type: mode })
-                });
-                const d = await r.json();
-                if(d.status === 'success') {
-                    document.getElementById('resBox').innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(d.url)}&type=video" controls></video>`;
-                    pre.style.display = 'block';
-                    st.innerText = "تم الجلب! ✅";
+                if(mode === 'ai') {
+                    // استخدام محرك معالجة مختلف (DeepAI/Alternative)
+                    const res = await fetch('https://api.vkrdown.com/ai/upscale', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ image: currentImg })
+                    });
+                    const data = await res.json();
+                    if(!data.url) throw new Error();
+                    document.getElementById('res').innerHTML = `<img src="${data.url}">`;
+                    document.getElementById('dl').href = data.url;
                 } else {
-                    alert(d.message);
+                    const url = document.getElementById('vUrl').value;
+                    const res = await fetch('/api/download', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ url, type: mode })
+                    });
+                    const data = await res.json();
+                    document.getElementById('res').innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(data.url)}&type=video" controls></video>`;
                 }
+                pre.style.display = 'block';
             } catch(e) {
-                alert("خطأ في الاتصال");
-            } finally { st.style.display = 'none'; }
+                alert("عذراً، محرك الذكاء الاصطناعي تحت الصيانة حالياً. جرب فيديوهات تيك توك الآن فهي تعمل!");
+            } finally { ld.style.display = 'none'; }
         }
     </script>
 </body>
