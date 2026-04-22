@@ -2,11 +2,13 @@
   "version": 2,
   "functions": {
     "api/download.js": { "maxDuration": 10 },
-    "api/proxy.js":    { "maxDuration": 10 }
+    "api/proxy.js":    { "maxDuration": 10 },
+    "api/enhance.js":  { "maxDuration": 25 }
   },
   "routes": [
     { "src": "/api/download", "dest": "/api/download.js" },
     { "src": "/api/proxy",    "dest": "/api/proxy.js"    },
+    { "src": "/api/enhance",  "dest": "/api/enhance.js"  },
     { "src": "/(.*)",         "dest": "/index.html"      }
   ]
 }
