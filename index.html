@@ -3,166 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Pro | v8.2</title>
+    <title>Social Media Pro | v8.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); --border: #222; }
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
         .app { width: 100%; max-width: 420px; }
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        .platform-selector { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .platform-btn { flex: 1; min-width: 100px; padding: 12px; border-radius: 15px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; font-size: 13px; }
+        .platform-selector { display: flex; gap: 8px; margin-bottom: 20px; }
+        .platform-btn { flex: 1; padding: 12px; border-radius: 15px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; font-size: 12px; }
         .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
-        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); background: #000; color: #fff; text-align: center; margin-bottom: 15px; }
+        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid var(--border); background: #000; color: #fff; text-align: center; margin-bottom: 15px; }
         #fileZone { display: none; margin-bottom: 15px; }
-        .upload-label { display: block; padding: 30px; border: 2px dashed var(--border); border-radius: 18px; text-align: center; cursor: pointer; color: #888; }
-        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 900; font-size: 18px; cursor: pointer; }
+        .upload-label { display: block; padding: 25px; border: 2px dashed #333; border-radius: 15px; text-align: center; color: #888; cursor: pointer; }
+        .main-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--grad); color: #fff; font-weight: 900; cursor: pointer; }
+        .main-btn:disabled { opacity: 0.5; }
         #previewArea { display: none; margin-top: 25px; }
-        .media-container { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: #000; }
-        video, img { width: 100%; display: block; max-height: 500px; }
-        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; text-align: center; cursor: pointer; }
-        .skeleton { display: none; margin-top: 25px; }
-        .sk-media { width: 100%; height: 300px; background: #1a1a1a; border-radius: 20px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .media-container { border-radius: 15px; overflow: hidden; background: #000; border: 1px solid #333; }
+        img, video { width: 100%; display: block; }
+        .btn-save { display: block; margin-top: 15px; padding: 15px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-align: center; text-decoration: none; }
+        .loader { display: none; margin: 20px 0; text-align: center; color: var(--p); font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="app">
-        <div class="header"><h1>Social Media Pro</h1><p>امممممممم✨</p></div>
+        <div class="header"><h1>Social Media Pro</h1><p>V8.3 - الثبات العالي</p></div>
         <div class="box">
             <div class="platform-selector">
-                <button id="tkBtn" class="platform-btn" onclick="setPlatform('tiktok')">TikTok</button>
-                <button id="igBtn" class="platform-btn" onclick="setPlatform('instagram')">Instagram</button>
-                <button id="aiBtn" class="platform-btn" onclick="setPlatform('ai')">توضيح الصور ✨</button>
+                <button id="tkBtn" class="platform-btn" onclick="setMode('tiktok')">TikTok</button>
+                <button id="igBtn" class="platform-btn" onclick="setMode('instagram')">Instagram</button>
+                <button id="aiBtn" class="platform-btn" onclick="setMode('ai')"> اممممممممم✨</button>
             </div>
-            <div id="inputGroup">
+            
+            <div id="ui-input">
                 <input type="text" id="vUrl" placeholder="اختر المنصة أولاً" disabled>
                 <div id="fileZone">
-                    <label class="upload-label" for="imgInput">
-                        <span id="fileLabelText">اضغط لرفع صورة من الاستوديو 📸</span>
-                        <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleFile(this)">
+                    <label class="upload-label" for="imgInp">
+                        <span id="lblTxt">اضغط لرفع الصورة 📸</span>
+                        <input type="file" id="imgInp" accept="image/*" style="display:none" onchange="previewFile(this)">
                     </label>
                 </div>
             </div>
-            <button id="go" class="main-btn" onclick="run()" disabled>جلب المحتوى</button>
-            <div id="status" style="margin-top:15px; text-align:center; font-size:13px; color:#888;"></div>
-            <div id="skeleton" class="skeleton"><div class="sk-media"></div></div>
+
+            <button id="runBtn" class="main-btn" onclick="execute()" disabled>ابدأ الآن</button>
+            <div id="status" class="loader">جاري العمل... يرجى الانتظار ⏳</div>
+
             <div id="previewArea">
-                <div class="media-container" id="mediaBox"></div>
-                <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
+                <div class="media-container" id="resBox"></div>
+                <a id="dlLink" class="btn-save">حفظ في الألبوم 📥</a>
             </div>
         </div>
     </div>
 
     <script>
-        let selectedPlatform = null;
-        let resData = {};
-        let base64Image = null;
+        let mode = null;
+        let imgData = null;
 
-        function setPlatform(p) {
-            selectedPlatform = p;
-            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(p + 'Btn').classList.add('active');
-            document.getElementById('go').disabled = false;
-            if (p === 'ai') {
-                document.getElementById('vUrl').style.display = 'none';
-                document.getElementById('fileZone').style.display = 'block';
-                document.getElementById('go').innerText = "توضيح الآن ✨";
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(m+'Btn').classList.add('active');
+            document.getElementById('runBtn').disabled = false;
+            
+            const inp = document.getElementById('vUrl');
+            const fz = document.getElementById('fileZone');
+            
+            if(m === 'ai') {
+                inp.style.display = 'none';
+                fz.style.display = 'block';
             } else {
-                document.getElementById('vUrl').style.display = 'block';
-                document.getElementById('fileZone').style.display = 'none';
-                document.getElementById('vUrl').disabled = false;
-                document.getElementById('vUrl').placeholder = "الصق الرابط هنا";
-                document.getElementById('go').innerText = "جلب الفيديو";
+                inp.style.display = 'block';
+                fz.style.display = 'none';
+                inp.disabled = false;
+                inp.placeholder = "الصق الرابط هنا";
             }
         }
 
-        function handleFile(input) {
+        function previewFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    base64Image = e.target.result;
-                    document.getElementById('fileLabelText').innerText = "✅ تم اختيار الصورة";
+                reader.onload = e => { 
+                    imgData = e.target.result;
+                    document.getElementById('lblTxt').innerText = "✅ تم تجهيز الصورة";
                 };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        async function run() {
+        async function execute() {
             const st = document.getElementById('status');
             const pre = document.getElementById('previewArea');
-            const sk = document.getElementById('skeleton');
-            const btn = document.getElementById('go');
+            const btn = document.getElementById('runBtn');
+            const resBox = document.getElementById('resBox');
 
-            btn.disabled = true;
+            st.style.display = 'block';
             pre.style.display = 'none';
-            sk.style.display = 'block';
-            st.innerText = "جاري المعالجة... يرجى الانتظار";
+            btn.disabled = true;
 
             try {
-                if (selectedPlatform === 'ai') {
-                    if (!base64Image) throw new Error("يرجى اختيار صورة");
-                    // إرسال مباشر للمحرك لتجاوز حدود السيرفر
+                if(mode === 'ai') {
+                    if(!imgData) throw new Error("ارفع صورة أولاً");
+                    // استخدام محرك معالجة مباشر ومستقر
                     const r = await fetch('https://api.vkrdown.com/ai/upscale', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ image: base64Image })
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ image: imgData })
                     });
                     const d = await r.json();
-                    if (d.url) {
-                        resData = { status: 'success', url: d.url };
-                        document.getElementById('mediaBox').innerHTML = `<img src="${d.url}">`;
-                    } else {
-                        throw new Error("السيرفر مشغول، جرب صورة أصغر");
-                    }
+                    if(!d.url) throw new Error("السيرفر مشغول، حاول بصورة أصغر");
+                    resBox.innerHTML = `<img src="${d.url}">`;
+                    document.getElementById('dlLink').href = d.url;
                 } else {
-                    const url = document.getElementById('vUrl').value.trim();
+                    const url = document.getElementById('vUrl').value;
                     const r = await fetch('/api/download', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: selectedPlatform, url: url })
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ url, type: mode })
                     });
                     const d = await r.json();
-                    if (d.status === 'success') {
-                        resData = d;
-                        document.getElementById('mediaBox').innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(d.url)}&type=video" controls playsinline></video>`;
-                    } else {
-                        throw new Error(d.message);
-                    }
+                    if(d.status !== 'success') throw new Error(d.message);
+                    resBox.innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(d.url)}&type=video" controls></video>`;
+                    document.getElementById('dlLink').onclick = () => alert('استخدم زر المشاركة في الجوال');
                 }
                 pre.style.display = 'block';
-                st.innerText = "تم بنجاح! ✅";
-            } catch (e) {
-                st.innerText = "❌ " + e.message;
+                st.innerText = "اكتمل العمل! ✅";
+            } catch(e) {
+                alert(e.message);
+                st.innerText = "❌ حدث خطأ";
             } finally {
-                sk.style.display = 'none';
                 btn.disabled = false;
-            }
-        }
-
-        async function downloadMe() {
-            const b = document.getElementById('saveBtn');
-            b.innerText = "جاري التحضير...";
-            try {
-                const url = (selectedPlatform === 'ai') ? resData.url : `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
-                const r = await fetch(url);
-                const blob = await r.blob();
-                const file = new File([blob], selectedPlatform === 'ai' ? "photo.jpg" : "video.mp4", { type: blob.type });
-                if (navigator.share) {
-                    await navigator.share({ files: [file] });
-                } else {
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = "social_media_pro_file";
-                    a.click();
-                }
-            } catch (e) {
-                alert("اضغط مطولاً للحفظ");
-            } finally {
-                b.innerText = "حفظ في الألبوم 📥";
             }
         }
     </script>
