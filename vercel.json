@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "functions": {
-    "api/*.js": { "maxDuration": 10 }
-  },
   "rewrites": [
     { "source": "/api/download", "destination": "/api/download.js" },
     { "source": "/api/proxy", "destination": "/api/proxy.js" },
-    { "source": "/api/enhance", "destination": "/api/enhance.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
