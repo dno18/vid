@@ -1,13 +1,34 @@
-export default async function handler(req, res) {
-    const { url } = req.query;
-    if (!url) return res.status(400).send('No URL');
+const fetch = require('node-fetch');
+
+module.exports = async (req, res) => {
+    const { url, type } = req.query;
+    if (!url) return res.status(400).send('Missing URL');
+
     try {
-        const response = await fetch(url);
-        const buffer = await response.arrayBuffer();
-        res.setHeader('Content-Type', 'video/mp4');
-        res.setHeader('Content-Disposition', 'attachment; filename="video.mp4"');
-        res.send(Buffer.from(buffer));
+        const response = await fetch(decodeURIComponent(url), {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Content-Type', type === 'video' ? 'video/mp4' : 'image/jpeg');
+        
+        // إرسال البيانات مباشرة (Streaming) لتحسين السرعة في الآيفون
+        response.body.pipe(res);
     } catch (e) {
-        res.status(500).send('Error');
+        res.status(500).send('Proxy Error');
     }
-}
+};
+
+
+
+
+
+
+
+
+
+
+
+
