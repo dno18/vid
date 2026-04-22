@@ -3,52 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Downloader</title>
+    <title>Social Media Pro | v6.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); --border: #222; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Tajawal', sans-serif; }
-        body { background: var(--bg); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
         .app { width: 100%; max-width: 420px; }
-        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); margin-top: 20px; }
-        .header h1 { text-align: center; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 28px; }
-        input { width: 100%; padding: 18px; border-radius: 15px; background: #000; border: 1px solid #222; color: #fff; text-align: center; margin-bottom: 15px; outline: none; }
+        .header { text-align: center; margin-bottom: 25px; margin-top: 10px; }
+        .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .platform-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .platform-btn { flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; transition: 0.3s; font-weight: 700; }
+        .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); box-shadow: 0 0 20px rgba(0, 112, 243, 0.4); }
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); background: #000; color: #fff; outline: none; transition: 0.3s; text-align: center; font-size: 15px; margin-bottom: 15px; }
         input:focus { border-color: var(--p); }
-        .main-btn { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--grad); color: #fff; font-weight: 900; cursor: pointer; font-size: 16px; }
-        .main-btn:disabled { opacity: 0.5; }
-        #loading { display: none; text-align: center; margin: 15px 0; color: var(--p); font-weight: bold; }
-        #previewArea { display: none; margin-top: 20px; }
-        .media-container { border-radius: 20px; overflow: hidden; border: 1px solid #333; background: #000; }
-        video { width: 100%; display: block; }
-        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 15px; font-weight: 900; text-align: center; text-decoration: none; }
+        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 900; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .main-btn:disabled { opacity: 0.6; }
+        #status { margin-top: 15px; text-align: center; color: #888; font-size: 13px; min-height: 20px; }
+        #previewArea { display: none; margin-top: 25px; animation: slideUp 0.5s ease; }
+        .media-box { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: #000; }
+        video { width: 100%; display: block; max-height: 450px; }
+        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; text-align: center; border: none; }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
     </style>
 </head>
 <body>
     <div class="app">
-        <div class="header"><h1>Social Downloader</h1></div>
+        <div class="header"><h1>Social Media Pro</h1><p>تحميل آمن وسريع</p></div>
         <div class="box">
-            <input type="text" id="vUrl" placeholder="الصق رابط تيك توك أو إنستقرام">
-            <button id="go" class="main-btn" onclick="download()">جلب الفيديو 📥</button>
-            <div id="loading">جاري التحميل... ⏳</div>
+            <div class="platform-selector">
+                <button id="tkBtn" class="platform-btn active" onclick="sel('tiktok')">TikTok</button>
+                <button id="igBtn" class="platform-btn" onclick="sel('instagram')">Instagram</button>
+            </div>
+            <input type="text" id="vUrl" placeholder="الصق الرابط هنا" autocomplete="off">
+            <button id="go" class="main-btn" onclick="run()">جلب المحتوى</button>
+            <div id="status"></div>
+            
+            <div id="previewArea">
+                <div id="vZone">
+                    <div class="media-box"><video id="player" controls playsinline></video></div>
+                    <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
+                </div>
+            </div>
         </div>
-        <div id="previewArea">
-            <div class="media-container"><video id="player" controls playsinline></video></div>
-            <a id="dlLink" class="btn-save">حفظ الفيديو في الاستوديو 📲</a>
-        </div> 
     </div>
 
     <script>
-        async function download() {
-            const url = document.getElementById('vUrl').value;
+        let resData = {};
+
+        function sel(p) {
+            document.getElementById('tkBtn').className = p==='tiktok'?'platform-btn active':'platform-btn';
+            document.getElementById('igBtn').className = p==='instagram'?'platform-btn active':'platform-btn';
+        }
+
+        async function run() {
+            let urlInput = document.getElementById('vUrl');
+            let url = urlInput.value.trim();
+            url = url.replace(/^[\/]+/, ''); 
+            urlInput.value = url;
+
+            if(!url.includes('http')) return alert("الرجاء إدخال رابط صحيح");
+            
             const btn = document.getElementById('go');
-            const ld = document.getElementById('loading');
+            const st  = document.getElementById('status');
             const pre = document.getElementById('previewArea');
 
-            if(!url) return alert("يرجى لصق الرابط أولاً");
-
-            btn.disabled = true;
-            ld.style.display = 'block';
+            btn.disabled = true; 
+            btn.innerHTML = '<span class="loader"></span> جاري الجلب...';
+            st.innerHTML  = "جاري تتبع الرابط وفك الحماية...";
             pre.style.display = 'none';
+
+            // ← إعادة ضبط زر الحفظ مع كل طلب جديد
+            resetSaveBtn();
 
             try {
                 const r = await fetch('/api/download', {
@@ -57,21 +86,57 @@
                     body: JSON.stringify({ url })
                 });
                 const d = await r.json();
-                
+
                 if(d.status === 'success') {
-                    const proxiedUrl = `/api/proxy?url=${encodeURIComponent(d.url)}`;
-                    document.getElementById('player').src = proxiedUrl;
-                    document.getElementById('dlLink').href = proxiedUrl;
-                    document.getElementById('dlLink').download = "video.mp4";
+                    resData = d;
+                    st.innerHTML = `<span style="color:#00ff88">✓ تم العثور على الفيديو</span>`;
                     pre.style.display = 'block';
-                } else {
-                    alert(d.message || "فشل التحميل");
+                    document.getElementById('player').src = `/api/proxy?url=${encodeURIComponent(d.url)}&type=video`;
+                } else { 
+                    st.innerHTML = `<span style="color:#ff4444">✕ ${d.message}</span>`; 
                 }
-            } catch(e) {
-                alert("السيرفر لا يستجيب، حاول مرة أخرى");
+            } catch(e) { 
+                st.innerHTML = "✕ حدث خطأ في الاتصال بالسيرفر"; 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "جلب المحتوى"; 
+            }
+        }
+
+        function resetSaveBtn() {
+            const b = document.getElementById('saveBtn');
+            b.innerText  = "حفظ في الألبوم 📥";
+            b.disabled   = false;
+        }
+
+        async function downloadMe() {
+            const b = document.getElementById('saveBtn');
+            b.innerText  = "جاري تحضير الملف...";
+            b.disabled   = true;
+
+            try {
+                const pUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
+                const response = await fetch(pUrl);
+                const blob     = await response.blob();
+                const file     = new File([blob], "video.mp4", { type: "video/mp4" });
+
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    // share() قد يُرجع بدون error حتى لو المستخدم أغلق القائمة
+                    await navigator.share({ files: [file], title: 'حفظ الفيديو' });
+                } else {
+                    const link  = document.createElement('a');
+                    link.href   = URL.createObjectURL(blob);
+                    link.download = "video.mp4";
+                    link.click();
+                }
+            } catch (error) {
+                // AbortError = المستخدم أغلق قائمة المشاركة بدون حفظ، مش خطأ حقيقي
+                if (error?.name !== 'AbortError') {
+                    alert("اضغط مطولاً على الفيديو واختر 'حفظ الفيديو'");
+                }
             } finally {
-                btn.disabled = false;
-                ld.style.display = 'none';
+                // ← يرجع الزر دائماً بغض النظر عن النتيجة
+                resetSaveBtn();
             }
         }
     </script>
