@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Pro | v8.0</title>
+    <title>Social Media Pro | v8.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); --border: #222; }
@@ -21,10 +21,8 @@
         .select-hint { font-size: 12px; color: #f81ae5; text-align: center; margin-bottom: 10px; display: block; font-weight: bold; }
         input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); background: #000; color: #fff; outline: none; text-align: center; margin-bottom: 15px; }
         
-        /* منطقة رفع الصور */
         #fileZone { display: none; margin-bottom: 15px; }
-        .upload-label { display: block; padding: 30px; border: 2px dashed var(--border); border-radius: 18px; text-align: center; cursor: pointer; color: #888; transition: 0.3s; }
-        .upload-label:hover { border-color: var(--p); color: #fff; }
+        .upload-label { display: block; padding: 30px; border: 2px dashed var(--border); border-radius: 18px; text-align: center; cursor: pointer; color: #888; }
 
         .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 900; font-size: 18px; cursor: pointer; }
         .main-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -33,7 +31,7 @@
         .media-container { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: #000; }
         video, img { width: 100%; display: block; max-height: 500px; }
         
-        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; text-align: center; cursor: pointer; text-decoration: none; }
+        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; text-align: center; cursor: pointer; }
 
         .skeleton { display: none; margin-top: 25px; }
         .sk-media { width: 100%; height: 300px; background: #1a1a1a; border-radius: 20px; animation: pulse 1.5s infinite; }
@@ -43,7 +41,6 @@
 <body>
     <div class="app">
         <div class="header"><h1>Social Media Pro</h1><p>تحميل وذكاء اصطناعي ✨</p></div>
-        
         <div class="box">
             <span class="select-hint" id="hint">⚠️ اختر المنصة أولاً</span>
             <div class="platform-selector">
@@ -56,7 +53,7 @@
                 <input type="text" id="vUrl" placeholder="الصق الرابط هنا" disabled>
                 <div id="fileZone">
                     <label class="upload-label" for="imgInput">
-                        <span id="fileLabelText">اضغط هنا لرفع صورة غير واضحة 📸</span>
+                        <span id="fileLabelText">اضغط هنا لرفع صورة 📸</span>
                         <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleFile(this)">
                     </label>
                 </div>
@@ -67,8 +64,7 @@
             <div id="skeleton" class="skeleton"><div class="sk-media"></div></div>
 
             <div id="previewArea">
-                <div class="media-container" id="mediaBox">
-                    </div>
+                <div class="media-container" id="mediaBox"></div>
                 <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
             </div>
         </div>
@@ -81,35 +77,32 @@
 
         function setPlatform(p) {
             selectedPlatform = p;
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(p === 'tiktok' ? 'tkBtn' : p === 'instagram' ? 'igBtn' : 'aiBtn').classList.add('active');
-            
-            const vUrl = document.getElementById('vUrl');
-            const fileZone = document.getElementById('fileZone');
-            const goBtn = document.getElementById('go');
+            document.getElementById('tkBtn').className = (p === 'tiktok') ? 'platform-btn active' : 'platform-btn';
+            document.getElementById('igBtn').className = (p === 'instagram') ? 'platform-btn active' : 'platform-btn';
+            document.getElementById('aiBtn').className = (p === 'ai') ? 'platform-btn active' : 'platform-btn';
             
             document.getElementById('hint').style.display = 'none';
-            goBtn.disabled = false;
+            document.getElementById('go').disabled = false;
 
             if (p === 'ai') {
-                vUrl.style.display = 'none';
-                fileZone.style.display = 'block';
-                goBtn.innerText = "توضيح الصورة الآن ✨";
+                document.getElementById('vUrl').style.display = 'none';
+                document.getElementById('fileZone').style.display = 'block';
+                document.getElementById('go').innerText = "توضيح الصورة الآن ✨";
             } else {
-                vUrl.style.display = 'block';
-                fileZone.style.display = 'none';
-                vUrl.disabled = false;
-                vUrl.placeholder = `الصق رابط ${p === 'tiktok' ? 'تيك توك' : 'انستقرام'} هنا`;
-                goBtn.innerText = "جلب المحتوى";
+                document.getElementById('vUrl').style.display = 'block';
+                document.getElementById('fileZone').style.display = 'none';
+                document.getElementById('vUrl').disabled = false;
+                document.getElementById('vUrl').placeholder = "الصق الرابط هنا";
+                document.getElementById('go').innerText = "جلب المحتوى";
             }
         }
 
         function handleFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
+                reader.onload = function(e) {
                     base64Image = e.target.result;
-                    document.getElementById('fileLabelText').innerText = "✅ تم اختيار: " + input.files[0].name;
+                    document.getElementById('fileLabelText').innerText = "✅ تم اختيار الصورة";
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -122,21 +115,19 @@
             const btn = document.getElementById('go');
 
             let body = { type: selectedPlatform };
-
             if (selectedPlatform === 'ai') {
-                if (!base64Image) return alert("يرجى اختيار صورة أولاً");
+                if (!base64Image) return alert("يرجى اختيار صورة");
                 body.image = base64Image;
-                st.innerText = "جاري معالجة الصورة بالذكاء الاصطناعي... قد يستغرق الأمر 10 ثوانٍ";
             } else {
                 const url = document.getElementById('vUrl').value.trim();
                 if (!url) return alert("يرجى وضع الرابط");
                 body.url = url;
-                st.innerText = "جاري جلب الفيديو...";
             }
 
             btn.disabled = true;
             pre.style.display = 'none';
             sk.style.display = 'block';
+            st.innerText = "جاري المعالجة...";
 
             try {
                 const r = await fetch('/api/download', {
@@ -149,20 +140,18 @@
                 if (d.status === 'success') {
                     resData = d;
                     const mediaBox = document.getElementById('mediaBox');
-                    
                     if (selectedPlatform === 'ai') {
-                        mediaBox.innerHTML = `<img src="${d.url}" id="resImg">`;
+                        mediaBox.innerHTML = '<img src="' + d.url + '">';
                     } else {
-                        mediaBox.innerHTML = `<video src="/api/proxy?url=${encodeURIComponent(d.url)}&type=video" id="player" controls playsinline></video>`;
+                        mediaBox.innerHTML = '<video src="/api/proxy?url=' + encodeURIComponent(d.url) + '&type=video" controls playsinline></video>';
                     }
-                    
                     pre.style.display = 'block';
-                    st.innerText = "اكتملت العملية بنجاح! ✅";
+                    st.innerText = "اكتمل بنجاح! ✅";
                 } else {
                     st.innerText = "❌ " + d.message;
                 }
             } catch (e) {
-                st.innerText = "❌ حدث خطأ في السيرفر";
+                st.innerText = "❌ فشل الاتصال";
             } finally {
                 sk.style.display = 'none';
                 btn.disabled = false;
@@ -173,22 +162,21 @@
             const b = document.getElementById('saveBtn');
             b.innerText = "جاري التحميل...";
             try {
-                const url = selectedPlatform === 'ai' ? resData.url : `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
-                const r = await fetch(url);
+                const finalUrl = (selectedPlatform === 'ai') ? resData.url : '/api/proxy?url=' + encodeURIComponent(resData.url) + '&type=video';
+                const r = await fetch(finalUrl);
                 const blob = await r.blob();
-                const ext = selectedPlatform === 'ai' ? 'jpg' : 'mp4';
-                const file = new File([blob], `file.${ext}`, { type: blob.type });
+                const file = new File([blob], "file." + (selectedPlatform === 'ai' ? 'jpg' : 'mp4'), { type: blob.type });
 
                 if (navigator.share) {
                     await navigator.share({ files: [file] });
                 } else {
                     const a = document.createElement('a');
                     a.href = URL.createObjectURL(blob);
-                    a.download = `social_pro_file.${ext}`;
+                    a.download = "download";
                     a.click();
                 }
             } catch (e) {
-                alert("اضغط مطولاً على الوسائط للحفظ");
+                alert("حاول الحفظ اليدوي");
             } finally {
                 b.innerText = "حفظ في الألبوم 📥";
             }
