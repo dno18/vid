@@ -1,13 +1,14 @@
 {
-  "name": "social-media-downloader",
-  "version": "6.0.0",
-  "description": "TikTok & Instagram video downloader",
-  "main": "index.js",
-  "scripts": {
-    "start": "vercel dev"
+  "version": 2,
+  "functions": {
+    "api/download.js": { "maxDuration": 10 },
+    "api/proxy.js":    { "maxDuration": 10 },
+    "api/enhance.js":  { "maxDuration": 25 }
   },
-  "dependencies": {
-    "axios": "^1.6.0",
-    "node-fetch": "^2.7.0"
-  }
+  "routes": [
+    { "src": "/api/download", "dest": "/api/download.js" },
+    { "src": "/api/proxy",    "dest": "/api/proxy.js"    },
+    { "src": "/api/enhance",  "dest": "/api/enhance.js"  },
+    { "src": "/(.*)",         "dest": "/index.html"      }
+  ]
 }
