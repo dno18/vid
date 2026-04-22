@@ -1,6 +1,7 @@
 {
-  "name": "social-media-downloader",
-  "version": "9.0.0",
-  "description": "TikTok & Instagram video downloader",
-  "dependencies": {}
+  "name": "social-media-pro",
+  "version": "1.0.0",
+  "dependencies": {
+    "node-fetch": "^3.3.0"
+  }
 }
