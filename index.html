@@ -3,36 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Social Media Pro | v6.0</title>
+    <title>Social Media Pro | v7.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --p: #0070f3; --bg: #050505; --card: #121212; --grad: linear-gradient(135deg, #0070f3, #f81ae5); --border: #222; }
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
+        body { background: var(--bg); color: #fff; font-family: 'Tajawal', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
         .app { width: 100%; max-width: 420px; }
-        .header { text-align: center; margin-bottom: 25px; margin-top: 10px; }
+        .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
+        
+        /* Skeleton Animation */
+        .skeleton { display: none; margin-top: 25px; }
+        .sk-media { width: 100%; height: 250px; background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 20px; }
+        .sk-btn { width: 100%; height: 55px; background: #1a1a1a; border-radius: 18px; margin-top: 15px; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* History Style */
+        .history-section { margin-top: 30px; width: 100%; max-width: 420px; }
+        .history-title { font-size: 14px; color: #666; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item { background: #121212; border: 1px solid #222; padding: 10px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
+        .history-item:hover { border-color: var(--p); }
+        .history-thumb { width: 50px; height: 50px; background: var(--grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .history-info { flex: 1; }
+        .history-info p { font-size: 13px; font-weight: 700; color: #eee; }
+        .history-info span { font-size: 11px; color: #555; }
+
+        /* Existing Styles */
         .platform-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .platform-btn { flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; transition: 0.3s; font-weight: 700; }
-        .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); box-shadow: 0 0 20px rgba(0, 112, 243, 0.4); }
-        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); background: #000; color: #fff; outline: none; transition: 0.3s; text-align: center; font-size: 15px; margin-bottom: 15px; }
-        input:focus { border-color: var(--p); }
-        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 900; font-size: 18px; cursor: pointer; transition: 0.3s; }
-        .main-btn:disabled { opacity: 0.6; }
-        #status { margin-top: 15px; text-align: center; color: #888; font-size: 13px; min-height: 20px; }
-        #previewArea { display: none; margin-top: 25px; animation: slideUp 0.5s ease; }
-        .media-box { border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: #000; }
-        video { width: 100%; display: block; max-height: 450px; }
-        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; text-align: center; border: none; }
-        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        .platform-btn { flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; }
+        .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); background: #000; color: #fff; outline: none; text-align: center; margin-bottom: 15px; }
+        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 900; font-size: 18px; cursor: pointer; }
+        #previewArea { display: none; margin-top: 25px; }
+        video { width: 100%; border-radius: 20px; border: 1px solid var(--border); }
+        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; text-align: center; text-decoration: none; }
     </style>
 </head>
 <body>
     <div class="app">
-        <div class="header"><h1>Social Media Pro</h1><p>تحميل آمن وسريع</p></div>
+        <div class="header"><h1>Social Media Pro</h1><p>تحميل ذكي بمميزات خرافية</p></div>
+        
         <div class="box">
             <div class="platform-selector">
                 <button id="tkBtn" class="platform-btn active" onclick="sel('tiktok')">TikTok</button>
@@ -40,19 +53,35 @@
             </div>
             <input type="text" id="vUrl" placeholder="الصق الرابط هنا" autocomplete="off">
             <button id="go" class="main-btn" onclick="run()">جلب المحتوى</button>
-            <div id="status"></div>
-            
-            <div id="previewArea">
-                <div id="vZone">
-                    <div class="media-box"><video id="player" controls playsinline></video></div>
-                    <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
-                </div>
+            <div id="status" style="margin-top:10px; text-align:center; font-size:12px; color:#666;"></div>
+
+            <div id="skeleton" class="skeleton">
+                <div class="sk-media"></div>
+                <div class="sk-btn"></div>
             </div>
+
+            <div id="previewArea">
+                <video id="player" controls playsinline></video>
+                <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-title">
+                <span>آخر التحميلات</span>
+                <span onclick="clearHistory()" style="cursor:pointer; color:var(--p)">مسح</span>
+            </div>
+            <div id="historyList" class="history-list">
+                </div>
         </div>
     </div>
 
     <script>
         let resData = {};
+        const HISTORY_KEY = 'dl_history_v1';
+
+        // تحميل السجل عند فتح الصفحة
+        window.onload = () => { renderHistory(); };
 
         function sel(p) {
             document.getElementById('tkBtn').className = p==='tiktok'?'platform-btn active':'platform-btn';
@@ -60,24 +89,20 @@
         }
 
         async function run() {
-            let urlInput = document.getElementById('vUrl');
-            let url = urlInput.value.trim();
-            url = url.replace(/^[\/]+/, ''); 
-            urlInput.value = url;
-
+            const urlInput = document.getElementById('vUrl');
+            const url = urlInput.value.trim();
             if(!url.includes('http')) return alert("الرجاء إدخال رابط صحيح");
-            
+
             const btn = document.getElementById('go');
-            const st  = document.getElementById('status');
+            const sk = document.getElementById('skeleton');
             const pre = document.getElementById('previewArea');
+            const st = document.getElementById('status');
 
-            btn.disabled = true; 
-            btn.innerHTML = '<span class="loader"></span> جاري الجلب...';
-            st.innerHTML  = "جاري تتبع الرابط وفك الحماية...";
+            // إظهار الـ Skeleton وإخفاء النتائج القديمة
+            btn.disabled = true;
             pre.style.display = 'none';
-
-            // ← إعادة ضبط زر الحفظ مع كل طلب جديد
-            resetSaveBtn();
+            sk.style.display = 'block';
+            st.innerText = "جاري الاتصال بالمحركات...";
 
             try {
                 const r = await fetch('/api/download', {
@@ -89,54 +114,91 @@
 
                 if(d.status === 'success') {
                     resData = d;
-                    st.innerHTML = `<span style="color:#00ff88">✓ تم العثور على الفيديو</span>`;
-                    pre.style.display = 'block';
                     document.getElementById('player').src = `/api/proxy?url=${encodeURIComponent(d.url)}&type=video`;
-                } else { 
-                    st.innerHTML = `<span style="color:#ff4444">✕ ${d.message}</span>`; 
+                    pre.style.display = 'block';
+                    st.innerText = "تم الجلب بنجاح!";
+                    addToHistory(url, d.url); // إضافة للسجل
+                } else {
+                    st.innerText = "فشل: " + d.message;
                 }
-            } catch(e) { 
-                st.innerHTML = "✕ حدث خطأ في الاتصال بالسيرفر"; 
-            } finally { 
-                btn.disabled = false; 
-                btn.innerText = "جلب المحتوى"; 
+            } catch(e) {
+                st.innerText = "خطأ في الشبكة";
+            } finally {
+                sk.style.display = 'none';
+                btn.disabled = false;
+                renderHistory();
             }
         }
 
-        function resetSaveBtn() {
-            const b = document.getElementById('saveBtn');
-            b.innerText  = "حفظ في الألبوم 📥";
-            b.disabled   = false;
+        // --- وظائف السجل (History Functions) ---
+        function addToHistory(originalUrl, videoUrl) {
+            let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            const newItem = {
+                id: Date.now(),
+                url: originalUrl,
+                video: videoUrl,
+                time: new Date().toLocaleTimeString('ar-SA')
+            };
+            // حذف المكرر وإضافة الجديد في البداية
+            history = history.filter(i => i.url !== originalUrl);
+            history.unshift(newItem);
+            // الاحتفاظ بآخر 5 فقط
+            if(history.length > 5) history.pop();
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            
+            if(history.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#444; font-size:12px; margin-top:10px;">لا يوجد سجل حالياً</p>';
+                return;
+            }
+
+            list.innerHTML = history.map(item => `
+                <div class="history-item" onclick="loadFromHistory('${item.url}')">
+                    <div class="history-thumb">🎬</div>
+                    <div class="history-info">
+                        <p>${item.url.substring(0, 30)}...</p>
+                        <span>${item.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadFromHistory(url) {
+            document.getElementById('vUrl').value = url;
+            run();
+        }
+
+        function clearHistory() {
+            localStorage.removeItem(HISTORY_KEY);
+            renderHistory();
         }
 
         async function downloadMe() {
             const b = document.getElementById('saveBtn');
-            b.innerText  = "جاري تحضير الملف...";
-            b.disabled   = true;
-
+            b.innerText = "جاري التحميل...";
+            b.disabled = true;
             try {
                 const pUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
-                const response = await fetch(pUrl);
-                const blob     = await response.blob();
-                const file     = new File([blob], "video.mp4", { type: "video/mp4" });
-
-                if (navigator.share && navigator.canShare({ files: [file] })) {
-                    // share() قد يُرجع بدون error حتى لو المستخدم أغلق القائمة
-                    await navigator.share({ files: [file], title: 'حفظ الفيديو' });
+                const r = await fetch(pUrl);
+                const blob = await r.blob();
+                const file = new File([blob], "video.mp4", { type: "video/mp4" });
+                if (navigator.share) {
+                    await navigator.share({ files: [file] });
                 } else {
-                    const link  = document.createElement('a');
-                    link.href   = URL.createObjectURL(blob);
-                    link.download = "video.mp4";
-                    link.click();
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = "video.mp4";
+                    a.click();
                 }
-            } catch (error) {
-                // AbortError = المستخدم أغلق قائمة المشاركة بدون حفظ، مش خطأ حقيقي
-                if (error?.name !== 'AbortError') {
-                    alert("اضغط مطولاً على الفيديو واختر 'حفظ الفيديو'");
-                }
+            } catch (e) {
+                alert("اضغط مطولاً على الفيديو للحفظ");
             } finally {
-                // ← يرجع الزر دائماً بغض النظر عن النتيجة
-                resetSaveBtn();
+                b.innerText = "حفظ في الألبوم 📥";
+                b.disabled = false;
             }
         }
     </script>
