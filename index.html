@@ -13,24 +13,21 @@
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Skeleton Animation */
         .skeleton { display: none; margin-top: 25px; }
         .sk-media { width: 100%; height: 250px; background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 20px; }
         .sk-btn { width: 100%; height: 55px; background: #1a1a1a; border-radius: 18px; margin-top: 15px; animation: loading 1.5s infinite; }
         @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* History Style */
         .history-section { margin-top: 30px; width: 100%; max-width: 420px; }
         .history-title { font-size: 14px; color: #666; margin-bottom: 10px; display: flex; justify-content: space-between; }
         .history-list { display: flex; flex-direction: column; gap: 10px; }
         .history-item { background: #121212; border: 1px solid #222; padding: 10px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
         .history-item:hover { border-color: var(--p); }
-        .history-thumb { width: 50px; height: 50px; background: var(--grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .history-thumb { width: 50px; height: 50px; background: var(--grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
         .history-info { flex: 1; min-width: 0; }
         .history-info p { font-size: 13px; font-weight: 700; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .history-info span { font-size: 11px; color: #555; }
 
-        /* Existing Styles */
         .platform-selector { display: flex; gap: 10px; margin-bottom: 20px; }
         .platform-btn { flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; font-family: 'Tajawal', sans-serif; font-size: 16px; }
         .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
@@ -39,13 +36,11 @@
         #previewArea { display: none; margin-top: 25px; }
         video { width: 100%; border-radius: 20px; border: 1px solid var(--border); }
 
-        /* زرا التنزيل */
         .download-btns { display: flex; gap: 10px; margin-top: 15px; }
         .btn-album {
             flex: 1; padding: 16px 10px; background: #fff; color: #000;
             border-radius: 18px; font-weight: 900; text-align: center;
-            text-decoration: none; cursor: pointer; border: none;
-            font-family: 'Tajawal', sans-serif; font-size: 15px;
+            cursor: pointer; border: none; font-family: 'Tajawal', sans-serif; font-size: 15px;
         }
         .btn-app {
             flex: 1; padding: 16px 10px; background: var(--grad); color: #fff;
@@ -54,11 +49,10 @@
         }
         .btn-album:disabled, .btn-app:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* مكتبة التطبيق */
         .library-section { margin-top: 30px; width: 100%; max-width: 420px; }
         .lib-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .lib-title { font-size: 18px; font-weight: 900; color: #fff; }
-        .lib-clear { font-size: 12px; color: var(--p); cursor: pointer; }
+        .lib-clear { font-size: 12px; color: #e33; cursor: pointer; }
 
         .lib-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
         .lib-tab {
@@ -68,44 +62,37 @@
         }
         .lib-tab.active { background: var(--p); color: #fff; border-color: var(--p); }
 
-        .lib-grid { display: flex; flex-direction: column; gap: 10px; }
-        .lib-item {
-            background: #121212; border: 1px solid #222; border-radius: 18px;
-            overflow: hidden; position: relative;
-        }
-        .lib-item video { width: 100%; display: block; border-radius: 0; border: none; max-height: 300px; object-fit: cover; }
-        .lib-item-footer {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; background: #0d0d0d;
-        }
+        .lib-grid { display: flex; flex-direction: column; gap: 12px; }
+        .lib-item { background: #121212; border: 1px solid #222; border-radius: 18px; overflow: hidden; }
+        .lib-item video { width: 100%; display: block; border-radius: 0; border: none; max-height: 320px; background: #000; }
+        .lib-item-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #0d0d0d; }
         .lib-item-info { font-size: 11px; color: #555; }
-        .lib-item-platform {
-            font-size: 11px; font-weight: 700; padding: 4px 10px;
-            border-radius: 20px; background: #1a1a1a;
-        }
+        .lib-item-platform { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #1a1a1a; }
         .lib-item-platform.tiktok { color: #69C9D0; border: 1px solid #69C9D033; }
         .lib-item-platform.instagram { color: #f81ae5; border: 1px solid #f81ae533; }
-        .lib-delete {
-            background: transparent; border: none; color: #444; cursor: pointer;
-            font-size: 16px; padding: 4px 8px;
-        }
+        .lib-delete { background: transparent; border: none; color: #555; cursor: pointer; font-size: 18px; padding: 4px 8px; }
+
+        .lib-saving { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: #0d0d0d; font-size: 12px; color: #888; }
+        .lib-saving-bar { flex: 1; max-width: 150px; height: 4px; background: #222; border-radius: 4px; overflow: hidden; }
+        .lib-saving-fill { height: 100%; background: var(--grad); border-radius: 4px; transition: width 0.3s; }
+
         .lib-empty { text-align: center; color: #333; font-size: 13px; padding: 30px 0; }
 
-        /* إشعار النجاح */
         .toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: #18c964; color: #fff; padding: 12px 24px; border-radius: 50px;
             font-weight: 700; font-size: 14px; z-index: 999;
-            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
         }
         .toast.show { opacity: 1; }
+        .toast.error { background: #e33; }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="header"><h1>Social Media Pro</h1><p>اممممممم - | -</p></div>
 
-        <div class="box" style="background:#121212; padding:25px; border-radius:30px; border:1px solid #222; box-shadow:0 20px 40px rgba(0,0,0,0.6);">
+        <div style="background:#121212; padding:25px; border-radius:30px; border:1px solid #222; box-shadow:0 20px 40px rgba(0,0,0,0.6);">
             <div class="platform-selector">
                 <button id="tkBtn" class="platform-btn active" onclick="sel('tiktok')">TikTok</button>
                 <button id="igBtn" class="platform-btn" onclick="sel('instagram')">Instagram</button>
@@ -128,7 +115,6 @@
             </div>
         </div>
 
-        <!-- السجل القديم -->
         <div class="history-section">
             <div class="history-title">
                 <span>آخر التحميلات</span>
@@ -137,11 +123,10 @@
             <div id="historyList" class="history-list"></div>
         </div>
 
-        <!-- مكتبة التطبيق -->
         <div class="library-section">
             <div class="lib-header">
                 <span class="lib-title">🗂️ مكتبتي</span>
-                <span class="lib-clear" onclick="clearLibrary()">مسح الكل</span>
+                <span class="lib-clear" onclick="clearLibrary()">🗑️ مسح الكل</span>
             </div>
             <div class="lib-tabs">
                 <button class="lib-tab active" onclick="switchLib('all')">الكل</button>
@@ -155,11 +140,73 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ── IndexedDB setup ──
+        const DB_NAME = 'videosDB';
+        const DB_VERSION = 1;
+        const STORE = 'videos';
+        let db = null;
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                if (db) return resolve(db);
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onupgradeneeded = e => {
+                    const d = e.target.result;
+                    if (!d.objectStoreNames.contains(STORE)) {
+                        const store = d.createObjectStore(STORE, { keyPath: 'id' });
+                        store.createIndex('platform', 'platform', { unique: false });
+                    }
+                };
+                req.onsuccess = e => { db = e.target.result; resolve(db); };
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function dbPut(item) {
+            const d = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = d.transaction(STORE, 'readwrite');
+                tx.objectStore(STORE).put(item);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function dbGetAll() {
+            const d = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = d.transaction(STORE, 'readonly');
+                const req = tx.objectStore(STORE).getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function dbDelete(id) {
+            const d = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = d.transaction(STORE, 'readwrite');
+                tx.objectStore(STORE).delete(id);
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function dbClear() {
+            const d = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = d.transaction(STORE, 'readwrite');
+                tx.objectStore(STORE).clear();
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        // ── App state ──
         let resData = {};
         let currentPlatform = 'tiktok';
         let currentLibTab = 'all';
         const HISTORY_KEY = 'dl_history_v1';
-        const LIBRARY_KEY = 'app_library_v1';
 
         window.onload = () => { renderHistory(); renderLibrary(); };
 
@@ -169,11 +216,11 @@
             document.getElementById('igBtn').className = p==='instagram'?'platform-btn active':'platform-btn';
         }
 
-        function showToast(msg) {
+        function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
             t.innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
+            t.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => t.className = 'toast', 2800);
         }
 
         async function run() {
@@ -191,7 +238,6 @@
             sk.style.display = 'block';
             st.innerText = "جاري الاتصال بالمحركات...";
 
-            // تحديد المنصة تلقائياً من الرابط
             if(url.includes('instagram.com')) sel('instagram');
             else sel('tiktok');
 
@@ -221,7 +267,7 @@
             }
         }
 
-        // ── حفظ في الألبوم (نفس القديم) ──
+        // ── حفظ في الألبوم ──
         async function downloadToAlbum() {
             const b = document.getElementById('saveAlbumBtn');
             b.innerText = "جاري التحميل...";
@@ -247,28 +293,68 @@
             }
         }
 
-        // ── حفظ في التطبيق ──
-        function saveToApp() {
+        // ── حفظ في التطبيق (IndexedDB) ──
+        async function saveToApp() {
             if(!resData.url) return;
-            const library = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
 
-            // تجنب التكرار
-            if(library.find(i => i.originalUrl === resData.originalUrl)) {
-                showToast('هذا الفيديو محفوظ مسبقاً ✓');
-                return;
+            const btn = document.getElementById('saveAppBtn');
+            btn.disabled = true;
+            btn.innerText = "جاري التحميل...";
+
+            try {
+                // تحقق من التكرار
+                const all = await dbGetAll();
+                if(all.find(i => i.originalUrl === resData.originalUrl)) {
+                    showToast('هذا الفيديو محفوظ مسبقاً ✓');
+                    btn.disabled = false;
+                    btn.innerText = "🗂️ حفظ في التطبيق";
+                    return;
+                }
+
+                // جلب الفيديو كـ blob حتى يشتغل offline
+                const proxyUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
+                const response = await fetch(proxyUrl);
+                if(!response.ok) throw new Error('fetch failed');
+
+                // قراءة مع progress تقريبي
+                const contentLength = response.headers.get('Content-Length');
+                const total = contentLength ? parseInt(contentLength) : 0;
+                const reader = response.body.getReader();
+                const chunks = [];
+                let received = 0;
+
+                while(true) {
+                    const { done, value } = await reader.read();
+                    if(done) break;
+                    chunks.push(value);
+                    received += value.length;
+                    if(total > 0) {
+                        const pct = Math.round((received / total) * 100);
+                        btn.innerText = `جاري التحميل ${pct}%`;
+                    }
+                }
+
+                const blob = new Blob(chunks, { type: 'video/mp4' });
+
+                const item = {
+                    id: Date.now(),
+                    originalUrl: resData.originalUrl,
+                    platform: resData.platform,
+                    time: new Date().toLocaleString('ar-SA'),
+                    blob: blob
+                };
+
+                await dbPut(item);
+                showToast('تم الحفظ في مكتبتك 🗂️');
+                renderLibrary();
+
+            } catch(e) {
+                showToast('فشل الحفظ، حاول مرة أخرى', true);
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "🗂️ حفظ في التطبيق";
             }
-
-            const newItem = {
-                id: Date.now(),
-                originalUrl: resData.originalUrl,
-                videoUrl: resData.url,
-                platform: resData.platform,
-                time: new Date().toLocaleString('ar-SA')
-            };
-            library.unshift(newItem);
-            localStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
-            showToast('تم الحفظ في مكتبتك 🗂️');
-            renderLibrary();
         }
 
         // ── عرض المكتبة ──
@@ -280,51 +366,57 @@
             renderLibrary();
         }
 
-        function renderLibrary() {
+        async function renderLibrary() {
             const grid = document.getElementById('libGrid');
-            let library = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
-            if(currentLibTab !== 'all') library = library.filter(i => i.platform === currentLibTab);
+            grid.innerHTML = '<div class="lib-empty" style="color:#555;">جاري التحميل...</div>';
+            try {
+                let items = await dbGetAll();
+                // ترتيب من الأحدث للأقدم
+                items.sort((a, b) => b.id - a.id);
+                if(currentLibTab !== 'all') items = items.filter(i => i.platform === currentLibTab);
 
-            if(library.length === 0) {
-                grid.innerHTML = `<div class="lib-empty">لا توجد فيديوهات محفوظة في هذا القسم</div>`;
-                return;
+                if(items.length === 0) {
+                    grid.innerHTML = '<div class="lib-empty">لا توجد فيديوهات محفوظة في هذا القسم</div>';
+                    return;
+                }
+
+                grid.innerHTML = '';
+                for(const item of items) {
+                    const objectUrl = URL.createObjectURL(item.blob);
+                    const div = document.createElement('div');
+                    div.className = 'lib-item';
+                    div.id = 'libitem-' + item.id;
+                    div.innerHTML = `
+                        <video src="${objectUrl}" controls playsinline preload="metadata"></video>
+                        <div class="lib-item-footer">
+                            <span class="lib-item-info">${item.time}</span>
+                            <span class="lib-item-platform ${item.platform}">${item.platform === 'tiktok' ? '🎵 TikTok' : '📸 Instagram'}</span>
+                            <button class="lib-delete" onclick="deleteLibItem(${item.id})" title="حذف">🗑️</button>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                }
+            } catch(e) {
+                grid.innerHTML = '<div class="lib-empty">خطأ في تحميل المكتبة</div>';
             }
-
-            grid.innerHTML = library.map(item => `
-                <div class="lib-item" id="libitem-${item.id}">
-                    <video src="/api/proxy?url=${encodeURIComponent(item.videoUrl)}&type=video" controls playsinline preload="metadata"></video>
-                    <div class="lib-item-footer">
-                        <span class="lib-item-info">${item.time}</span>
-                        <span class="lib-item-platform ${item.platform}">${item.platform === 'tiktok' ? '🎵 TikTok' : '📸 Instagram'}</span>
-                        <button class="lib-delete" onclick="deleteLibItem(${item.id})" title="حذف">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
         }
 
-        function deleteLibItem(id) {
-            let library = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
-            library = library.filter(i => i.id !== id);
-            localStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
-            renderLibrary();
+        async function deleteLibItem(id) {
+            await dbDelete(id);
             showToast('تم الحذف');
-        }
-
-        function clearLibrary() {
-            if(!confirm('هل تريد مسح كل المكتبة؟')) return;
-            localStorage.removeItem(LIBRARY_KEY);
             renderLibrary();
         }
 
-        // ── السجل (History) ──
+        async function clearLibrary() {
+            if(!confirm('هل تريد مسح كل المكتبة؟')) return;
+            await dbClear();
+            renderLibrary();
+        }
+
+        // ── السجل ──
         function addToHistory(originalUrl, videoUrl) {
             let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            const newItem = {
-                id: Date.now(),
-                url: originalUrl,
-                video: videoUrl,
-                time: new Date().toLocaleTimeString('ar-SA')
-            };
+            const newItem = { id: Date.now(), url: originalUrl, video: videoUrl, time: new Date().toLocaleTimeString('ar-SA') };
             history = history.filter(i => i.url !== originalUrl);
             history.unshift(newItem);
             if(history.length > 5) history.pop();
