@@ -12,8 +12,7 @@
         .app { width: 100%; max-width: 420px; }
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-weight: 900; font-size: 32px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .box { background: var(--card); padding: 25px; border-radius: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; }
-        
+
         /* Skeleton Animation */
         .skeleton { display: none; margin-top: 25px; }
         .sk-media { width: 100%; height: 250px; background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 20px; }
@@ -27,26 +26,86 @@
         .history-item { background: #121212; border: 1px solid #222; padding: 10px; border-radius: 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; }
         .history-item:hover { border-color: var(--p); }
         .history-thumb { width: 50px; height: 50px; background: var(--grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .history-info { flex: 1; }
-        .history-info p { font-size: 13px; font-weight: 700; color: #eee; }
+        .history-info { flex: 1; min-width: 0; }
+        .history-info p { font-size: 13px; font-weight: 700; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .history-info span { font-size: 11px; color: #555; }
 
         /* Existing Styles */
         .platform-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .platform-btn { flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; }
+        .platform-btn { flex: 1; padding: 15px; border-radius: 18px; border: 1px solid var(--border); background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700; font-family: 'Tajawal', sans-serif; font-size: 16px; }
         .platform-btn.active { background: var(--p); color: #fff; border-color: var(--p); }
-        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); background: #000; color: #fff; outline: none; text-align: center; margin-bottom: 15px; }
-        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 900; font-size: 18px; cursor: pointer; }
+        input { width: 100%; padding: 20px; border-radius: 18px; border: 2px solid var(--border); background: #000; color: #fff; outline: none; text-align: center; margin-bottom: 15px; font-family: 'Tajawal', sans-serif; font-size: 15px; }
+        .main-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; background: var(--grad); color: #fff; font-weight: 900; font-size: 18px; cursor: pointer; font-family: 'Tajawal', sans-serif; }
         #previewArea { display: none; margin-top: 25px; }
         video { width: 100%; border-radius: 20px; border: 1px solid var(--border); }
-        .btn-save { display: block; margin-top: 15px; padding: 18px; background: #fff; color: #000; border-radius: 18px; font-weight: 900; width: 100%; text-align: center; text-decoration: none; }
+
+        /* زرا التنزيل */
+        .download-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-album {
+            flex: 1; padding: 16px 10px; background: #fff; color: #000;
+            border-radius: 18px; font-weight: 900; text-align: center;
+            text-decoration: none; cursor: pointer; border: none;
+            font-family: 'Tajawal', sans-serif; font-size: 15px;
+        }
+        .btn-app {
+            flex: 1; padding: 16px 10px; background: var(--grad); color: #fff;
+            border-radius: 18px; font-weight: 900; text-align: center;
+            cursor: pointer; border: none; font-family: 'Tajawal', sans-serif; font-size: 15px;
+        }
+        .btn-album:disabled, .btn-app:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* مكتبة التطبيق */
+        .library-section { margin-top: 30px; width: 100%; max-width: 420px; }
+        .lib-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .lib-title { font-size: 18px; font-weight: 900; color: #fff; }
+        .lib-clear { font-size: 12px; color: var(--p); cursor: pointer; }
+
+        .lib-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .lib-tab {
+            flex: 1; padding: 10px; border-radius: 14px; border: 1px solid var(--border);
+            background: #1a1a1a; color: #888; cursor: pointer; font-weight: 700;
+            font-family: 'Tajawal', sans-serif; font-size: 14px; text-align: center;
+        }
+        .lib-tab.active { background: var(--p); color: #fff; border-color: var(--p); }
+
+        .lib-grid { display: flex; flex-direction: column; gap: 10px; }
+        .lib-item {
+            background: #121212; border: 1px solid #222; border-radius: 18px;
+            overflow: hidden; position: relative;
+        }
+        .lib-item video { width: 100%; display: block; border-radius: 0; border: none; max-height: 300px; object-fit: cover; }
+        .lib-item-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; background: #0d0d0d;
+        }
+        .lib-item-info { font-size: 11px; color: #555; }
+        .lib-item-platform {
+            font-size: 11px; font-weight: 700; padding: 4px 10px;
+            border-radius: 20px; background: #1a1a1a;
+        }
+        .lib-item-platform.tiktok { color: #69C9D0; border: 1px solid #69C9D033; }
+        .lib-item-platform.instagram { color: #f81ae5; border: 1px solid #f81ae533; }
+        .lib-delete {
+            background: transparent; border: none; color: #444; cursor: pointer;
+            font-size: 16px; padding: 4px 8px;
+        }
+        .lib-empty { text-align: center; color: #333; font-size: 13px; padding: 30px 0; }
+
+        /* إشعار النجاح */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #18c964; color: #fff; padding: 12px 24px; border-radius: 50px;
+            font-weight: 700; font-size: 14px; z-index: 999;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
     <div class="app">
         <div class="header"><h1>Social Media Pro</h1><p>اممممممم - | -</p></div>
-        
-        <div class="box">
+
+        <div class="box" style="background:#121212; padding:25px; border-radius:30px; border:1px solid #222; box-shadow:0 20px 40px rgba(0,0,0,0.6);">
             <div class="platform-selector">
                 <button id="tkBtn" class="platform-btn active" onclick="sel('tiktok')">TikTok</button>
                 <button id="igBtn" class="platform-btn" onclick="sel('instagram')">Instagram</button>
@@ -62,30 +121,59 @@
 
             <div id="previewArea">
                 <video id="player" controls playsinline></video>
-                <button id="saveBtn" class="btn-save" onclick="downloadMe()">حفظ في الألبوم 📥</button>
+                <div class="download-btns">
+                    <button id="saveAlbumBtn" class="btn-album" onclick="downloadToAlbum()">📥 حفظ في الألبوم</button>
+                    <button id="saveAppBtn" class="btn-app" onclick="saveToApp()">🗂️ حفظ في التطبيق</button>
+                </div>
             </div>
         </div>
 
+        <!-- السجل القديم -->
         <div class="history-section">
             <div class="history-title">
                 <span>آخر التحميلات</span>
                 <span onclick="clearHistory()" style="cursor:pointer; color:var(--p)">مسح</span>
             </div>
-            <div id="historyList" class="history-list">
-                </div>
+            <div id="historyList" class="history-list"></div>
+        </div>
+
+        <!-- مكتبة التطبيق -->
+        <div class="library-section">
+            <div class="lib-header">
+                <span class="lib-title">🗂️ مكتبتي</span>
+                <span class="lib-clear" onclick="clearLibrary()">مسح الكل</span>
+            </div>
+            <div class="lib-tabs">
+                <button class="lib-tab active" onclick="switchLib('all')">الكل</button>
+                <button class="lib-tab" onclick="switchLib('tiktok')">🎵 TikTok</button>
+                <button class="lib-tab" onclick="switchLib('instagram')">📸 Instagram</button>
+            </div>
+            <div id="libGrid" class="lib-grid"></div>
         </div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
         let resData = {};
+        let currentPlatform = 'tiktok';
+        let currentLibTab = 'all';
         const HISTORY_KEY = 'dl_history_v1';
+        const LIBRARY_KEY = 'app_library_v1';
 
-        // تحميل السجل عند فتح الصفحة
-        window.onload = () => { renderHistory(); };
+        window.onload = () => { renderHistory(); renderLibrary(); };
 
         function sel(p) {
+            currentPlatform = p;
             document.getElementById('tkBtn').className = p==='tiktok'?'platform-btn active':'platform-btn';
             document.getElementById('igBtn').className = p==='instagram'?'platform-btn active':'platform-btn';
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
         }
 
         async function run() {
@@ -98,11 +186,14 @@
             const pre = document.getElementById('previewArea');
             const st = document.getElementById('status');
 
-            // إظهار الـ Skeleton وإخفاء النتائج القديمة
             btn.disabled = true;
             pre.style.display = 'none';
             sk.style.display = 'block';
             st.innerText = "جاري الاتصال بالمحركات...";
+
+            // تحديد المنصة تلقائياً من الرابط
+            if(url.includes('instagram.com')) sel('instagram');
+            else sel('tiktok');
 
             try {
                 const r = await fetch('/api/download', {
@@ -113,11 +204,11 @@
                 const d = await r.json();
 
                 if(d.status === 'success') {
-                    resData = d;
+                    resData = { ...d, originalUrl: url, platform: currentPlatform };
                     document.getElementById('player').src = `/api/proxy?url=${encodeURIComponent(d.url)}&type=video`;
                     pre.style.display = 'block';
                     st.innerText = "تم الجلب بنجاح!";
-                    addToHistory(url, d.url); // إضافة للسجل
+                    addToHistory(url, d.url);
                 } else {
                     st.innerText = "فشل: " + d.message;
                 }
@@ -130,7 +221,102 @@
             }
         }
 
-        // --- وظائف السجل (History Functions) ---
+        // ── حفظ في الألبوم (نفس القديم) ──
+        async function downloadToAlbum() {
+            const b = document.getElementById('saveAlbumBtn');
+            b.innerText = "جاري التحميل...";
+            b.disabled = true;
+            try {
+                const pUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
+                const r = await fetch(pUrl);
+                const blob = await r.blob();
+                const file = new File([blob], "video.mp4", { type: "video/mp4" });
+                if (navigator.share) {
+                    await navigator.share({ files: [file] });
+                } else {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = "video.mp4";
+                    a.click();
+                }
+            } catch (e) {
+                alert("اضغط مطولاً على الفيديو للحفظ");
+            } finally {
+                b.innerText = "📥 حفظ في الألبوم";
+                b.disabled = false;
+            }
+        }
+
+        // ── حفظ في التطبيق ──
+        function saveToApp() {
+            if(!resData.url) return;
+            const library = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+
+            // تجنب التكرار
+            if(library.find(i => i.originalUrl === resData.originalUrl)) {
+                showToast('هذا الفيديو محفوظ مسبقاً ✓');
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                originalUrl: resData.originalUrl,
+                videoUrl: resData.url,
+                platform: resData.platform,
+                time: new Date().toLocaleString('ar-SA')
+            };
+            library.unshift(newItem);
+            localStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
+            showToast('تم الحفظ في مكتبتك 🗂️');
+            renderLibrary();
+        }
+
+        // ── عرض المكتبة ──
+        function switchLib(tab) {
+            currentLibTab = tab;
+            document.querySelectorAll('.lib-tab').forEach((el, i) => {
+                el.classList.toggle('active', ['all','tiktok','instagram'][i] === tab);
+            });
+            renderLibrary();
+        }
+
+        function renderLibrary() {
+            const grid = document.getElementById('libGrid');
+            let library = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+            if(currentLibTab !== 'all') library = library.filter(i => i.platform === currentLibTab);
+
+            if(library.length === 0) {
+                grid.innerHTML = `<div class="lib-empty">لا توجد فيديوهات محفوظة في هذا القسم</div>`;
+                return;
+            }
+
+            grid.innerHTML = library.map(item => `
+                <div class="lib-item" id="libitem-${item.id}">
+                    <video src="/api/proxy?url=${encodeURIComponent(item.videoUrl)}&type=video" controls playsinline preload="metadata"></video>
+                    <div class="lib-item-footer">
+                        <span class="lib-item-info">${item.time}</span>
+                        <span class="lib-item-platform ${item.platform}">${item.platform === 'tiktok' ? '🎵 TikTok' : '📸 Instagram'}</span>
+                        <button class="lib-delete" onclick="deleteLibItem(${item.id})" title="حذف">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteLibItem(id) {
+            let library = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+            library = library.filter(i => i.id !== id);
+            localStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
+            renderLibrary();
+            showToast('تم الحذف');
+        }
+
+        function clearLibrary() {
+            if(!confirm('هل تريد مسح كل المكتبة؟')) return;
+            localStorage.removeItem(LIBRARY_KEY);
+            renderLibrary();
+        }
+
+        // ── السجل (History) ──
         function addToHistory(originalUrl, videoUrl) {
             let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
             const newItem = {
@@ -139,10 +325,8 @@
                 video: videoUrl,
                 time: new Date().toLocaleTimeString('ar-SA')
             };
-            // حذف المكرر وإضافة الجديد في البداية
             history = history.filter(i => i.url !== originalUrl);
             history.unshift(newItem);
-            // الاحتفاظ بآخر 5 فقط
             if(history.length > 5) history.pop();
             localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
         }
@@ -150,12 +334,10 @@
         function renderHistory() {
             const list = document.getElementById('historyList');
             const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            
             if(history.length === 0) {
                 list.innerHTML = '<p style="text-align:center; color:#444; font-size:12px; margin-top:10px;">لا يوجد سجل حالياً</p>';
                 return;
             }
-
             list.innerHTML = history.map(item => `
                 <div class="history-item" onclick="loadFromHistory('${item.url}')">
                     <div class="history-thumb">🎬</div>
@@ -175,31 +357,6 @@
         function clearHistory() {
             localStorage.removeItem(HISTORY_KEY);
             renderHistory();
-        }
-
-        async function downloadMe() {
-            const b = document.getElementById('saveBtn');
-            b.innerText = "جاري التحميل...";
-            b.disabled = true;
-            try {
-                const pUrl = `/api/proxy?url=${encodeURIComponent(resData.url)}&type=video`;
-                const r = await fetch(pUrl);
-                const blob = await r.blob();
-                const file = new File([blob], "video.mp4", { type: "video/mp4" });
-                if (navigator.share) {
-                    await navigator.share({ files: [file] });
-                } else {
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = "video.mp4";
-                    a.click();
-                }
-            } catch (e) {
-                alert("اضغط مطولاً على الفيديو للحفظ");
-            } finally {
-                b.innerText = "حفظ في الألبوم 📥";
-                b.disabled = false;
-            }
         }
     </script>
 </body>
